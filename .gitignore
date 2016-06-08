@@ -1,0 +1,23 @@
+doc
+build
+.dep
+*.tmp
+*.backup
+
+# Eclipse files
+*eclipse*
+
+# QtCreator files
+*.includes
+*.files
+*.config
+*.creator
+*.creator.user
+
+# Shadow files
+*kate-swp
+*~
+
+# Backup files
+*backup*
+*Backup*

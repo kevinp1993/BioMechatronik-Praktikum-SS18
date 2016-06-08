@@ -1,0 +1,40 @@
+From 8dc86a6495b16e656d5fff4d55b4b6f78e3b3c82 Mon Sep 17 00:00:00 2001
+From: Robert ABEL <rabel@cit-ec.uni-bielefeld.de>
+Date: Fri, 4 Jul 2014 16:51:30 +0200
+Subject: [PATCH] ARM: fix rounding issue with WORKING_AREA stack size
+
+Signed-off-by: Robert ABEL <rabel@cit-ec.uni-bielefeld.de>
+---
+ os/ports/GCC/ARMCMx/chcore_v6m.h | 2 +-
+ os/ports/GCC/ARMCMx/chcore_v7m.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/os/ports/GCC/ARMCMx/chcore_v6m.h b/os/ports/GCC/ARMCMx/chcore_v6m.h
+index be1381e..2937be9 100644
+--- a/os/ports/GCC/ARMCMx/chcore_v6m.h
++++ b/os/ports/GCC/ARMCMx/chcore_v6m.h
+@@ -238,7 +238,7 @@ struct context {
+  * @details This macro is used to allocate a static thread working area
+  *          aligned as both position and size.
+  */
+-#define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)]
++#define WORKING_AREA(s, n) stkalign_t s[(THD_WA_SIZE(n) + sizeof(stkalign_t) - 1) / sizeof(stkalign_t)]
+ 
+ /**
+  * @brief   IRQ prologue code.
+diff --git a/os/ports/GCC/ARMCMx/chcore_v7m.h b/os/ports/GCC/ARMCMx/chcore_v7m.h
+index 3706a92..5cb8867 100644
+--- a/os/ports/GCC/ARMCMx/chcore_v7m.h
++++ b/os/ports/GCC/ARMCMx/chcore_v7m.h
+@@ -338,7 +338,7 @@ struct context {
+  * @details This macro is used to allocate a static thread working area
+  *          aligned as both position and size.
+  */
+-#define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)]
++#define WORKING_AREA(s, n) stkalign_t s[(THD_WA_SIZE(n) + sizeof(stkalign_t) - 1) / sizeof(stkalign_t)]
+ 
+ /**
+  * @brief   IRQ prologue code.
+-- 
+1.8.4.msysgit.0
+

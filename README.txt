@@ -1,0 +1,197 @@
+AMiRo-OS is the operating system for the base version of the
+Autonomous Mini Robot (AMiRo) [1,2]. It utilizes ChibiOS (a real-time
+operating system for embedded devices developed by Giovanni di Sirio;
+see <http://chibios.org>) as system kernel and extends it with
+platform specific functionalities.
+
+Copyright (C) 2016  Thomas Schöpping et al.
+(a complete list of all authors is given below)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+The development of this software was supported by the Excellence
+Cluster EXC 227 Cognitive Interaction Technology. The Excellence
+Cluster EXC 227 is a grant of the Deutsche Forschungsgemeinschaft
+(DFG) in the context of the German Excellence Initiative.
+
+Authors:
+ - Thomas Schöpping        <tschoepp[at]cit-ec.uni-bielefeld.de>
+ - Timo Korthals           <tkorthals[at]cit-ec.uni-bielefeld.de>
+ - Stefan Herbechtsmeier   <sherbrec[at]cit-ec.uni-bielefeld.de>
+ - Teerapat Chinapirom     <tchinapirom[at]cit-ec.uni-bielefeld.de>
+ - Robert Abel
+ - Marvin Barther
+ - Claas Braun
+ - Tristan Kenneweg
+
+References:
+ [1] Herbrechtsmeier S., Rückert U., & Sitte J. (2012). "AMiRo -
+     Autonomous Mini Robot for Research and Education". In Advances in
+     Autonomous Mini Robots (pp. 101-112). Springer Berlin
+     Heidelberg.
+ [2] Schöpping T., Korthals T., Herbrechtsmeier S., & Rückert U.
+     (2015). "AMiRo: A Mini Robot for Scientific Applications" In
+     Advances in Computational Intelligence (pp. 199-205). Springer
+     International Publishing.
+
+
+
+#####################################################################
+#                                                                   #
+#     RRRRRRRR  EEEEEEEE    AAA    DDDDDDDD  MM     MM EEEEEEEE     #
+#     RR     RR EE         AA AA   DD     DD MMM   MMM EE           #
+#     RR     RR EE        AA   AA  DD     DD MMMM MMMM EE           #
+#     RRRRRRRR  EEEEEE   AA     AA DD     DD MM MMM MM EEEEEE       #
+#     RR   RR   EE       AAAAAAAAA DD     DD MM     MM EE           #
+#     RR    RR  EE       AA     AA DD     DD MM     MM EE           #
+#     RR     RR EEEEEEEE AA     AA DDDDDDDD  MM     MM EEEEEEEE     #
+#                                                                   #
+#####################################################################
+
+This file will help you to setup all required software on your system,
+compile the source code, and flash it to the AMiRo modules.
+
+=====================================================================
+
+CONTENTS:
+ 1  Required software
+   1.1  gcc-arm-none-eabi
+   1.2  ChibiOS
+   1.3  AMiRo-BLT
+ 2  Recommended software
+   2.1  gtkterm and hterm
+   2.2  QtCreator
+ 3  Building and flashing
+
+=====================================================================
+
+1 - REQUIRED SOFTWARE
+---------------------
+
+In order to compile the source code, you need to install the GCC for
+ARM embedded devices. Since AMiRo-OS requires ChibiOS as system
+kernel, you need a copy of that project as well. Furthermore, AMiRo-OS
+requires a compatible bootloader, such as provided by the AMiRo-BLT
+project.
+
+1.1 gcc-arm-none-eabi
+
+Various versions of the GCC for ARM embedded devices can be found at
+<https://launchpad.net/gcc-arm-embedded>. It is highly recommended to
+use the version 4.8 with update 2014-q1 since some others will cause
+issues. For installation of the compiler toolchain, please follow the
+instructions that can be found on the web page.
+
+1.2 ChibiOS
+
+Since AMiRo-OS uses ChibiOS as underlying system kernel, you need to
+acquire a copy of it as well. First, go to the directory which
+contains the AMiRo-OS folder (but do not go into the AMiRo-OS
+directory itself!). Now clone the GIT repository of ChibiOS and
+checkout version 2.6.x:
+  >$ git clone https://github.com/ChibiOS/ChibiOS.git ChibiOS
+  >$ cd ChibiOS
+  >$ git checkout 2e6dfc7364e7551483922ea6afbaea8f3501ab0e
+It is highly recommended to use exactly this commit. Although newer
+commits in the 2.6.x branch might work fine, AMiRo-OS is not
+compatible with ChibiOS version 3 or newer.
+
+AMiRo-OS comes with some patches to ChibiOS, which must be applied as
+well before compiling the project. Therefore you need to copy all
+files from the ./patches directory of AMiRo-OS to the root directory
+of ChibiOS. You can then apply the patches via the following command:
+  >$ for i in `ls | grep patch`; do git am --ignore-space-change --ignore-whitespace < ${i}; done
+If the files could not be patched successfully, you are probably using
+an incompatible version of ChibiOS (try to checkout the correct commit
+as denoted above).
+
+1.3 AMiRo-BLT
+
+AMiRo-BLT is an additional software project, which is developed in
+parallel with AMiRo-OS. If you did not receive a copy of AMiRo-BLT
+with AMiRo-OS, you can find all code and documentation at
+<https://opensource.cit-ec.de/projects/amiro-os>. Instructions for
+installation and how to use the software provided by AMiRo-BLT can be
+found on the web page or in the project's readme file.
+
+2 - RECOMMENDED SOFTWARE
+------------------------
+
+In order to fully use all features of AMiRo-OS it is recommended to
+install the 'hterm' or 'gtkterm' application for accessing the robot.
+To ease further development, this project offers support for the 
+QtCreator IDE.
+
+2.1 - gtkterm and hterm
+
+Depending on your operating system, it is recommended to install
+'gtkterm' for Linux (available in the Ubuntu repositories), or 'hterm'
+for Windows.
+For gtkterm you need to modify the configuration file ~/.gtktermrc (it
+is generated automatically when you start the application for the
+first time) as follows:
+
+  port	= /dev/ttyUSB0
+  speed	= 115200
+  bits	= 8
+  stopbits	= 1
+  parity	= none
+  flow	= none
+  wait_delay	= 0
+  wait_char	= -1
+  rs485_rts_time_before_tx	= 30
+  rs485_rts_time_after_tx	= 30
+  echo	= False
+  crlfauto	= True
+
+For hterm you must need to configure the tool analogously.
+
+2.2 - QtCreator
+
+In order to setup QtCreator projects for the three AMiRo base modules,
+a script is provided in the directory ./ide/qtcreator/. It is
+accompanied by an additional README.txt file, which contains further
+information.
+
+3 - BUILDING AND FLASHING
+-------------------------
+
+Each time you modify any part of AMiRo-OS, you need to recompile the
+whole project for the according AMiRo module. Therefore you have to
+use the makefiles provided in ./devices/<DeviceToRecompile>/ by simply
+executing 'make' in the according directory. If you want to compile
+all modules at once, you can also use the makefile in the ./devices/
+folder.
+
+After compilation, you always have to flash the generated program to
+the robot. Therefore you need to install the SerialBoot tool provided
+by the AMiRo-BLT project. Furthermore the tool must be accessible
+globally under the environment variable 'SERIALBOOT'. You can do this
+by appending the following line to your ~/.bashrc file:
+
+  export SERIALBOOT=</absolute/path/to/the/SerialBoot/binary>
+
+You can test the tool by calling it via the variable:
+  >$ ${SERIALBOOT}
+This should print some information about the tool.
+Similar to the compilation procedure as described above, you can flash
+either each module separately, or all modules at once by executing
+'make flash' from the according directory.
+Note that you must connect the programming cable either to the
+DiWheelDrive or the PowerManagement module for flashing the operating
+system. All other modules are powered off after reset so that only
+these two offer a bootloader that is required for flashing.
+
+=====================================================================
+

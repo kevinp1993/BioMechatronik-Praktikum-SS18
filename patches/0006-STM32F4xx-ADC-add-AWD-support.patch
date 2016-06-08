@@ -1,0 +1,101 @@
+From: Thomas SCHÖPPING <tschoepp@techfak.uni-bielefeld.de>
+Date: Wed, 3 Mar 2015 15:43:17 +0200
+Subject: [PATCH] STM32F4xx: added support for the ADC analog watchdog
+
+Signed-off-by: Thomas SCHÖPPING <tschoepp@techfak.uni-bielefeld.de>
+---
+diff --git a/os/hal/platforms/STM32F4xx/adc_lld.c b/os/hal/platforms/STM32F4xx/adc_lld.c
+index e5de44a..5495649 100644
+--- a/os/hal/platforms/STM32F4xx/adc_lld.c
++++ b/os/hal/platforms/STM32F4xx/adc_lld.c
+@@ -124,7 +124,10 @@ CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
+     if (ADCD1.grpp != NULL)
+       _adc_isr_error_code(&ADCD1, ADC_ERR_OVERFLOW);
+   }
+-  /* TODO: Add here analog watchdog handling.*/
++  if (sr & ADC_SR_AWD) {
++    if (ADCD1.grpp != NULL)
++      _adc_isr_error_code(&ADCD1, ADC_ERR_WATCHDOG);
++  }
+ #endif /* STM32_ADC_USE_ADC1 */
+ 
+ #if STM32_ADC_USE_ADC2
+@@ -138,7 +141,10 @@ CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
+     if (ADCD2.grpp != NULL)
+       _adc_isr_error_code(&ADCD2, ADC_ERR_OVERFLOW);
+   }
+-  /* TODO: Add here analog watchdog handling.*/
++  if (sr & ADC_SR_AWD) {
++    if (ADCD1.grpp != NULL)
++      _adc_isr_error_code(&ADCD2, ADC_ERR_WATCHDOG);
++  }
+ #endif /* STM32_ADC_USE_ADC2 */
+ 
+ #if STM32_ADC_USE_ADC3
+@@ -152,7 +158,10 @@ CH_IRQ_HANDLER(ADC1_2_3_IRQHandler) {
+     if (ADCD3.grpp != NULL)
+       _adc_isr_error_code(&ADCD3, ADC_ERR_OVERFLOW);
+   }
+-  /* TODO: Add here analog watchdog handling.*/
++  if (sr & ADC_SR_AWD) {
++    if (ADCD1.grpp != NULL)
++      _adc_isr_error_code(&ADCD3, ADC_ERR_WATCHDOG);
++  }
+ #endif /* STM32_ADC_USE_ADC3 */
+ 
+   CH_IRQ_EPILOGUE();
+@@ -340,6 +349,8 @@ void adc_lld_start_conversion(ADCDriver *adcp) {
+   adcp->adc->SR    = 0;
+   adcp->adc->SMPR1 = grpp->smpr1;
+   adcp->adc->SMPR2 = grpp->smpr2;
++  adcp->adc->HTR   = grpp->htr;
++  adcp->adc->LTR   = grpp->ltr;
+   adcp->adc->SQR1  = grpp->sqr1;
+   adcp->adc->SQR2  = grpp->sqr2;
+   adcp->adc->SQR3  = grpp->sqr3;
+diff --git a/os/hal/platforms/STM32F4xx/adc_lld.h b/os/hal/platforms/STM32F4xx/adc_lld.h
+index 7cda791..be81ed3 100644
+--- a/os/hal/platforms/STM32F4xx/adc_lld.h
++++ b/os/hal/platforms/STM32F4xx/adc_lld.h
+@@ -306,7 +306,8 @@ typedef uint16_t adc_channels_num_t;
+  */
+ typedef enum {
+   ADC_ERR_DMAFAILURE = 0,                   /**< DMA operations failure.    */
+-  ADC_ERR_OVERFLOW = 1                      /**< ADC overflow condition.    */
++  ADC_ERR_OVERFLOW = 1,                     /**< ADC overflow condition.    */
++  ADC_ERR_WATCHDOG = 2                      /**< ADC watchdog condition.    */
+ } adcerror_t;
+ 
+ /**
+@@ -385,6 +386,16 @@ typedef struct {
+    */
+   uint32_t                  smpr2;
+   /**
++   * @brief   ADC watchdog higher threshold register.
++   * @details This filed defines the higher threshold for the analog watchdog.
++   */
++  uint16_t                  htr;
++  /**
++   * @brief   ADC watchdog lower threshold register.
++   * @details This filed defines the lower threshold for the analog watchdog.
++   */
++  uint16_t                  ltr;
++  /**
+    * @brief   ADC SQR1 register initialization data.
+    * @details Conversion group sequence 13...16 + sequence length.
+    */
+@@ -528,6 +539,14 @@ struct ADCDriver {
+ #define ADC_SMPR1_SMP_VBAT(n)   ((n) << 24) /**< @brief VBAT sampling time. */
+ /** @} */
+ 
++/**
++ * @name    Threshold settings helper macros
++ * @{
++ */
++#define ADC_HTR(n)              ((n > ADC_HTR_HT) ? ADC_HTR_HT : n) /**< @brief higher threshold limitation */
++#define ADC_LTR(n)              ((n > ADC_LTR_LT) ? ADC_LTR_LT : n) /**< @brief lower threshold limitation  */
++/** @} */
++
+ /*===========================================================================*/
+ /* External declarations.                                                    */
+ /*===========================================================================*/
