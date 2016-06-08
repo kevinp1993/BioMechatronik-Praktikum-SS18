@@ -20,10 +20,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-The development of this software was supported by the Excellence
-Cluster EXC 227 Cognitive Interaction Technology. The Excellence
-Cluster EXC 227 is a grant of the Deutsche Forschungsgemeinschaft
-(DFG) in the context of the German Excellence Initiative.
+This research/work was supported by the Cluster of Excellence
+Cognitive Interaction Technology 'CITEC' (EXC 277) at Bielefeld
+University, which is funded by the German Research Foundation (DFG).
 
 Authors:
  - Thomas Schöpping        <tschoepp[at]cit-ec.uni-bielefeld.de>
