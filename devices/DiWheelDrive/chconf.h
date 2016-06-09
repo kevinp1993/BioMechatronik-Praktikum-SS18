@@ -1,3 +1,12 @@
+/**
+ * @file    devices/DiWheelDrive/chconf.h
+ * @brief   Configuration file.
+ *
+ * @addtogroup config
+ * @details Kernel related settings and hooks.
+ * @{
+ */
+
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
 
@@ -505,3 +514,5 @@ void haltErrorCode(void);
 #define CORTEX_VTOR_INIT 0x00006000
 
 #endif  /* _CHCONF_H_ */
+
+/** @} */

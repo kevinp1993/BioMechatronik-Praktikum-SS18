@@ -1,3 +1,11 @@
+/**
+ * @file    STM32/qei_lld.h
+ * @brief   STM32 QEI subsystem low level driver header.
+ *
+ * @addtogroup QEI
+ * @{
+ */
+
 #ifndef _QEI_LLD_H_
 #define _QEI_LLD_H_
 
@@ -272,3 +280,5 @@ extern "C" {
 #endif /* HAL_USE_QEI */
 
 #endif /* _QEI_LLD_H_ */
+
+/** @} */

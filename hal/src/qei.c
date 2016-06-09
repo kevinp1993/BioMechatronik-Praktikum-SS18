@@ -1,3 +1,11 @@
+/**
+ * @file    qei.c
+ * @brief   QEI Driver code.
+ *
+ * @addtogroup QEI
+ * @{
+ */
+
 #include "ch.h"
 #include "hal.h"
 #include "qei.h"
@@ -128,3 +136,4 @@ void qeiDisable(QEIDriver *qeip) {
 
 #endif /* HAL_USE_QEI */
 
+/** @} */

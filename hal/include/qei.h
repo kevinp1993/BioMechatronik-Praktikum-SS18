@@ -1,3 +1,11 @@
+/**
+ * @file    qei.h
+ * @brief   QEI Driver macros and structures.
+ *
+ * @addtogroup QEI
+ * @{
+ */
+
 #ifndef _QEI_H_
 #define _QEI_H_
 
@@ -118,3 +126,5 @@ extern "C" {
 #endif /* HAL_USE_QEI */
 
 #endif /* _QEI_H_ */
+
+/** @} */

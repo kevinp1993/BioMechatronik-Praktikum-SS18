@@ -1,3 +1,12 @@
+/**
+ * @file    devices/PowerManagement/chconf.h
+ * @brief   Configuration file.
+ *
+ * @addtogroup config
+ * @details Kernel related settings and hooks.
+ * @{
+ */
+
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
 
@@ -505,3 +514,5 @@ void haltErrorCode(void);
 #define CORTEX_VTOR_INIT 0x00008000
 
 #endif  /* _CHCONF_H_ */
+
+/** @} */

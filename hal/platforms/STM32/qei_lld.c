@@ -1,3 +1,11 @@
+/**
+ * @file    STM32/qei_lld.c
+ * @brief   STM32 QEI subsystem low level driver.
+ *
+ * @addtogroup QEI
+ * @{
+ */
+
 #include "ch.h"
 #include "hal.h"
 
@@ -273,3 +281,5 @@ void qei_lld_disable(QEIDriver *qeip) {
 }
 
 #endif /* HAL_USE_QEI */
+
+/** @} */

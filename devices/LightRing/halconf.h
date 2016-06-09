@@ -1,3 +1,14 @@
+/**
+ * @file    devices/LightRing/halconf.h
+ * @brief   HAL configuration header.
+ * @details HAL configuration file, this file allows to enable or disable the
+ *          various device drivers from your application. You may also use
+ *          this file in order to override the device drivers default settings.
+ *
+ * @addtogroup HAL_CONF
+ * @{
+ */
+
 #ifndef _HALCONF_H_
 #define _HALCONF_H_
 
@@ -281,3 +292,5 @@
 #endif
 
 #endif /* _HALCONF_H_ */
+
+/** @} */
