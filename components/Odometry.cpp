@@ -15,9 +15,10 @@ using namespace amiro;
 using namespace constants::DiWheelDrive;
 
 
-Odometry::Odometry(MotorIncrements* mi)
+Odometry::Odometry(MotorIncrements* mi, L3G4200D* gyroscope)
     : BaseStaticThread<512>(),
       motorIncrements(mi),
+      gyro(gyroscope),
       eventSource(),
       period(50),
       incrementsPerRevolution(incrementsPerRevolution),
@@ -101,7 +102,7 @@ msg_t Odometry::main(void) {
   while (!this->shouldTerminate()) {
     time += MS2ST(this->period);
 
-    // Update the base distance, because it may change after an calibration
+    // Update the base distance, because it may change after a calibration
     this->updateWheelBaseDistance();
 
     // Get the actual speed
@@ -109,13 +110,18 @@ msg_t Odometry::main(void) {
 
     // Calculate the odometry
     this->updateOdometry();
+		
 
 //     chprintf((BaseSequentialStream*) &SD1, "X:%f Y:%f Phi:%f", this->pX,this->pY, this->pPhi);
 //     chprintf((BaseSequentialStream*) &SD1, "\r\n");
 //     chprintf((BaseSequentialStream*) &SD1, "distance_left:%f distance_right:%f", this->distance[0],this->distance[1]);
 //     chprintf((BaseSequentialStream*) &SD1, "\r\n");
 
-    chThdSleepUntil(time);
+	if (time >= System::getTime()) {
+      chThdSleepUntil(time);
+    } else {
+      chprintf((BaseSequentialStream*) &SD1, "WARNING Odometry: Unable to keep track\r\n");
+	}
   }
 
   return true;
@@ -125,11 +131,15 @@ void Odometry::updateOdometry() {
 
   // Get the temporary position and error
   float Cp3x3[9];
+  uint32_t angular_ud;
   chSysLock();
     float pX = this->pX;
     float pY = this->pY;
     float pPhi = this->pPhi;
     Matrix::copy<float>(this->Cp3x3,3,3,Cp3x3,3,3);
+    // Get the differentail gyro information and reset it
+    angular_ud = gyro->getAngular_ud(L3G4200D::AXIS_Z);
+	gyro->angularReset();
   chSysUnlock();
 
   ////////////////
@@ -137,7 +147,8 @@ void Odometry::updateOdometry() {
   ////////////////
 
   // TMP: Rotated angular
-  float dPhi = (this->distance[RIGHT_WHEEL] - this->distance[LEFT_WHEEL]) / this->wheelBaseDistanceSI;
+  // float dPhi = (this->distance[RIGHT_WHEEL] - this->distance[LEFT_WHEEL]) / this->wheelBaseDistanceSI;
+  float dPhi = ((float(angular_ud * 1e-3) * M_PI ) * 1e-3) / 180.0f;
 
   // TMP: Moved distance
   float dDistance = (this->distance[RIGHT_WHEEL] + this->distance[LEFT_WHEEL]) / 2.0f;

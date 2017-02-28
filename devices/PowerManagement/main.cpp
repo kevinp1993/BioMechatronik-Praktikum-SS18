@@ -976,11 +976,25 @@ int main(void) {
 
   extStart(&EXTD1, &extcfg);
 
-  boardClearI2CBus(GPIOB_GAUGE_SCL1);
-  boardClearI2CBus(GPIOB_GAUGE_SCL2);
+  boardClearI2CBus(GPIOB_GAUGE_SCL1, GPIOB_GAUGE_SDA1);
+  boardClearI2CBus(GPIOB_GAUGE_SCL2, GPIOB_GAUGE_SDA2);
 
   global.HW_I2C1.start(&global.i2c1_config);
   global.HW_I2C2.start(&global.i2c2_config);
+
+  uint16_t i2c_test = 0;
+  while (global.ina219[INA_VIO18].readRegister(INA219::Driver::REG_BUS_VOLTAGE, i2c_test) != RDY_OK) {
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "I2C #1 stalled! trying to clear the bus... (this will take 20 seconds)\n");
+    boardWriteLed(1);
+    boardResetBQ27500I2C(GPIOB_GAUGE_SCL2, GPIOB_GAUGE_SDA2);
+    boardWriteLed(0);
+  }
+  while (global.ina219[INA_VDD].readRegister(INA219::Driver::REG_BUS_VOLTAGE, i2c_test) != RDY_OK) {
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "I2C #2 stalled! trying to clear the bus... (this will take 20 seconds)\n");
+    boardWriteLed(1);
+    boardResetBQ27500I2C(GPIOB_GAUGE_SCL1, GPIOB_GAUGE_SDA1);
+    boardWriteLed(0);
+  }
 
   global.memory.init();
   uint8_t i = 0;

@@ -55,20 +55,20 @@ public:
 
   I2CConfig i2c1_config{
     /* I2C mode                 */ OPMODE_I2C,
-    /* frequency                */ 200000,
-    /* I2C fast mode duty cycle */ FAST_DUTY_CYCLE_2
+    /* frequency                */ 100000,
+    /* I2C fast mode duty cycle */ STD_DUTY_CYCLE
   };
   I2CConfig i2c2_config{
     /* I2C mode                 */ OPMODE_I2C,
-    /* frequency                */ 200000,
-    /* I2C fast mode duty cycle */ FAST_DUTY_CYCLE_2
+    /* frequency                */ 100000,
+    /* I2C fast mode duty cycle */ STD_DUTY_CYCLE
   };
 
   VCNL4020::VCNL4020Config vcnl4020_config{
     /* command             */ VCNL4020::ALS_EN | VCNL4020::PROX_EN | VCNL4020::SELFTIMED_EN,
     /* ambient parameter   */ VCNL4020::AMBIENT_RATE_2 | VCNL4020::AMBIENT_AUTO_OFFSET | VCNL4020::AMBIENT_AVG_32,
     /* IR LED current [mA] */ 200u,
-    /* proximity rate      */ VCNL4020::PROX_RATE_7_8125
+    /* proximity rate      */ VCNL4020::PROX_RATE_125
   };
 
   adcsample_t adc1_buffer[1];

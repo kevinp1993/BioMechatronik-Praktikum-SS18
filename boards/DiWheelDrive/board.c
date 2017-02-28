@@ -96,15 +96,49 @@ inline void boardWakeup(void) {
   palSetPad(GPIOC, GPIOC_SYS_PD_N);
 }
 
-inline void boardClearI2CBus(const uint8_t scl_pad) {
+inline void boardClearI2CBus(const uint8_t scl_pad, const uint8_t sda_pad) {
 
   uint8_t i;
 
-  // configure I²C SCL open drain
+  // configure I²C SCL and SDA open drain
   palSetPadMode(GPIOB, scl_pad, PAL_MODE_OUTPUT_OPENDRAIN);
+  palSetPadMode(GPIOB, sda_pad, PAL_MODE_OUTPUT_OPENDRAIN);
 
-  // perform bus clear as per I²C Specification v5 3.1.16
-  for (i = 0x00u; i < 0x09u; i++) {
+  // perform a 2-wire software reset for the eeprom (see AT24C01BN-SH-B datasheet, chapter 3)
+  // note: clock is ~50kHz (20us per cycle)
+  palSetPad(GPIOB, sda_pad);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palSetPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  for (i = 0; i < 9; ++i) {
+    palSetPad(GPIOB, scl_pad);
+    chThdSleepMicroseconds(10);
+    palClearPad(GPIOB, scl_pad);
+    chThdSleepMicroseconds(10);
+  }
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palSetPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+
+  // perform bus clear as per I²C Specification v6 3.1.16
+  // note: clock is 100kHz (10us per cycle)
+  for (i = 0; i < 10; i++) {
     palClearPad(GPIOB, scl_pad);
     chThdSleepMicroseconds(5);
     palSetPad(GPIOB, scl_pad);
@@ -113,5 +147,7 @@ inline void boardClearI2CBus(const uint8_t scl_pad) {
 
   // reconfigure I²C SCL
   palSetPadMode(GPIOB, scl_pad, PAL_MODE_STM32_ALTERNATE_OPENDRAIN);
+  palSetPadMode(GPIOB, sda_pad, PAL_MODE_STM32_ALTERNATE_OPENDRAIN);
 
+  return;
 }

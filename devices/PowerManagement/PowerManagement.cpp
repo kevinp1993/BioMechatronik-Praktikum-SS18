@@ -133,9 +133,7 @@ void PowerManagement::periodicBroadcast() {
     frame.data16[0] = this->proximityRingValue[i];
     frame.DLC = 2;
     this->transmitMessage(&frame);
-    // HACK This is a first workaround (do wrapping of 4 sensors, better timing than 10 ms in sleep)
-    // I choosed 10 ms, because 10 ms x 8 = 80 ms < 125 ms which is the updaterate CAN::UPDATE_PERIOD_MSEC
-    BaseThread::sleep(MS2ST(10));  // Sleep, otherwise the cognition-board wont receive all messages
+    BaseThread::sleep(US2ST(10)); // Use to sleep for 10 CAN cycle (@1Mbit), otherwise the cognition-board might not receive all messagee
   }
   ++this->bc_counter;
 }

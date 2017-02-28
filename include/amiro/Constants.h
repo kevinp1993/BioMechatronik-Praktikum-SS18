@@ -37,7 +37,7 @@ namespace amiro {
 
 namespace CAN {
 
-  const uint32_t UPDATE_PERIOD_MSEC        = MS2ST(125);
+  const uint32_t UPDATE_PERIOD_MSEC        = US2ST(62500);  // 16 Hz
 
   const uint32_t PERIODIC_TIMER_ID         = 1;
   const uint32_t RECEIVED_ID               = 2;
@@ -54,7 +54,10 @@ namespace CAN {
   const uint32_t LIGHT_RING_ID             = 3;
   const uint32_t COGNITION                 = 4;
 
-
+  const uint32_t MAGNETOMETER_X_ID         = 0x54;
+  const uint32_t MAGNETOMETER_Y_ID         = 0x55;
+  const uint32_t MAGNETOMETER_Z_ID         = 0x56;
+  const uint32_t GYROSCOPE_ID              = 0x58;
   const uint32_t PROXIMITY_FLOOR_ID        = 0x51;
   const uint32_t ODOMETRY_ID               = 0x50;
   const uint32_t BRIGHTNESS_ID             = 0x40;

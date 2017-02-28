@@ -148,6 +148,16 @@ msg_t DiWheelDrive::updateSensorVal() {
   for (int idx = 0; idx < 4; ++idx)
     this->proximityFloorValue[idx] = global.vcnl4020[idx].getProximityScaledWoOffset();
 
+  // Update magnetometer values
+  for (uint8_t axis = 0; axis < 3; ++axis) {
+    this->magnetometerValue[axis] = global.hmc5883l.getMagnetizationGauss(axis);
+  }
+
+  // Update gyroscope values
+  for (uint8_t axis = 0; axis < 3; ++axis) {
+    this->gyroscopeValue[axis] = global.l3g4200d.getAngularRate(axis);
+  }
+
   return 0;
 }
 
@@ -164,7 +174,7 @@ void DiWheelDrive::periodicBroadcast() {
 
   // Send the valocites µm/s of the x axis and µrad/s around z axis: end
   // Send the odometry: start
-  //       BaseThread::sleep(MS2ST(10));  // Sleep, otherwise the cognition-board wont receive all messages
+  BaseThread::sleep(US2ST(10)); // Use to sleep for 10 CAN cycle (@1Mbit), otherwise the cognition-board might not receive all messagee
   // Set the frame id
   frame.SID = 0;
   this->encodeDeviceId(&frame, CAN::ODOMETRY_ID);
@@ -181,7 +191,7 @@ void DiWheelDrive::periodicBroadcast() {
 
   // Send the odometry: end
   // Send the proximity values of the floor: start
-  //       BaseThread::sleep(MS2ST(10));  // Sleep, otherwise the cognition-board wont receive all messages
+  BaseThread::sleep(US2ST(10)); // Use to sleep for 10 CAN cycle (@1Mbit), otherwise the cognition-board might not receive all messagee
   // Set the frame id
   frame.SID = 0;
   this->encodeDeviceId(&frame, CAN::PROXIMITY_FLOOR_ID);
@@ -190,6 +200,24 @@ void DiWheelDrive::periodicBroadcast() {
   frame.data16[2] = this->proximityFloorValue[2];
   frame.data16[3] = this->proximityFloorValue[3];
   frame.DLC = 8;
+  this->transmitMessage(&frame);
+
+  // Send the magnetometer data
+  for (uint8_t axis = 0; axis < 3; ++axis) {
+    frame.SID = 0;
+    this->encodeDeviceId(&frame, CAN::MAGNETOMETER_X_ID + axis); // Y- and Z-axis have according IDs
+    frame.data32[0] = this->magnetometerValue[axis];
+    frame.DLC = 4;
+    this->transmitMessage(&frame);
+  }
+
+  // Send gyroscope data
+  frame.SID = 0;
+  this->encodeDeviceId(&frame, CAN::GYROSCOPE_ID);
+  frame.data16[0] = this->gyroscopeValue[0];
+  frame.data16[1] = this->gyroscopeValue[1];
+  frame.data16[2] = this->gyroscopeValue[2];
+  frame.DLC = 6;
   this->transmitMessage(&frame);
 
   // Send the board ID (board ID of DiWheelDrive = Robot ID)

@@ -76,8 +76,8 @@ const int rpmHalt[2] = {0, 0};
 
 const int blackStartFalling = 0x1000; // Where the black curve starts falling
 const int blackOff = 0x1800; // Where no more black is detected
-const int whiteStartRising = 0x4000; // Where the white curve starts rising
-const int whiteOn = 0x8000; // Where the white curve has reached the maximum value
+const int whiteStartRising = 0x2800; // Where the white curve starts rising
+const int whiteOn = 0x6000; // Where the white curve has reached the maximum value
 const int greyMax = (whiteOn + blackStartFalling) / 2; // Where grey has its maximum
 const int greyStartRising = blackStartFalling; // Where grey starts rising
 const int greyOff = whiteOn; // Where grey is completely off again
@@ -188,48 +188,88 @@ colorMember getMember(float (&fuzzyValue)[3]) {
 // Get a crisp output for the steering commands
 void defuzzyfication(colorMember (&member)[4], int (&rpmFuzzyCtrl)[2]) {
 
-	if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == BLACK &&
-	     member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == BLACK) {
+	// all sensors are equal
+	if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == member[constants::DiWheelDrive::PROX_FRONT_LEFT] &&
+	    member[constants::DiWheelDrive::PROX_FRONT_LEFT] == member[constants::DiWheelDrive::PROX_FRONT_RIGHT] &&
+	    member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == member[constants::DiWheelDrive::PROX_WHEEL_RIGHT]) {
+		// something is wrong -> stop
+		copyRpmSpeed(rpmHalt, rpmFuzzyCtrl);
+	// both front sensor detect a line
+	} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == BLACK &&
+	    member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == BLACK) {
 		// straight
 		copyRpmSpeed(rpmForward, rpmFuzzyCtrl);
+	// exact one front sensor detects a line
 	} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == BLACK ||
 	           member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == BLACK) {
 		// soft correction
-		if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == GREY)
+		if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == GREY) {
 			// soft right
 			copyRpmSpeed(rpmSoftRight, rpmFuzzyCtrl);
-		else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == WHITE)
+		} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == WHITE) {
 			// hard right
 			copyRpmSpeed(rpmHardRight, rpmFuzzyCtrl);
-		else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == GREY)
+		} else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == GREY) {
 			// soft left
 			copyRpmSpeed(rpmSoftLeft, rpmFuzzyCtrl);
-		else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == WHITE)
+		} else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == WHITE) {
 			// hard left
 			copyRpmSpeed(rpmHardLeft, rpmFuzzyCtrl);
+		}
+	// both wheel sensors detect a line
+	} else if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == BLACK &&
+	           member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == BLACK) {
+		// something is wrong -> stop
+		copyRpmSpeed(rpmHalt, rpmFuzzyCtrl);
+	// exactly one wheel sensor detects a line
+	} else if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == BLACK ||
+	           member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == BLACK) {
+		if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == BLACK) {
+			// turn left
+			copyRpmSpeed(rpmTurnLeft, rpmFuzzyCtrl);
+		} else if (member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == BLACK) {
+			// turn right
+			copyRpmSpeed(rpmTurnRight, rpmFuzzyCtrl);
+		}
+	// both front sensors may detect a line
+	} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == GREY &&
+	           member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == GREY) {
+		if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == GREY) {
+			// turn left
+			copyRpmSpeed(rpmTurnLeft, rpmFuzzyCtrl);
+		} else if (member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == GREY) {
+			// turn right
+			copyRpmSpeed(rpmTurnRight, rpmFuzzyCtrl);
+		}
+	// exactly one front sensor may detect a line
 	} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == GREY ||
 	           member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == GREY) {
-		if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == WHITE)
-			// turn right
-			copyRpmSpeed(rpmTurnRight, rpmFuzzyCtrl);
-		else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == WHITE)
+		if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == GREY) {
 			// turn left
 			copyRpmSpeed(rpmTurnLeft, rpmFuzzyCtrl);
-		else
-			// go straight
-			copyRpmSpeed(rpmForward, rpmFuzzyCtrl);
-	} else if (member[constants::DiWheelDrive::PROX_FRONT_LEFT] == WHITE &&
-	           member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == WHITE) {
-		// go straight and check wheel sensors
-		if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] != WHITE)
-			// turn left
-			copyRpmSpeed(rpmTurnLeft, rpmFuzzyCtrl);
-		else if (member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] != WHITE)
+		} else if (member[constants::DiWheelDrive::PROX_FRONT_RIGHT] == GREY) {
 			// turn right
 			copyRpmSpeed(rpmTurnRight, rpmFuzzyCtrl);
-		else
-            // line is lost -> stop
-            copyRpmSpeed(rpmHalt, rpmFuzzyCtrl);
+		}
+	// both wheel sensors may detect a line
+	} else if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == GREY &&
+	           member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == GREY) {
+		// something is wrong -> stop
+		copyRpmSpeed(rpmHalt, rpmFuzzyCtrl);
+	// exactly one wheel sensor may detect a line
+	} else if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == GREY ||
+	           member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == GREY) {
+		if (member[constants::DiWheelDrive::PROX_WHEEL_LEFT] == GREY) {
+			// turn left
+			copyRpmSpeed(rpmTurnLeft, rpmFuzzyCtrl);
+		} else if (member[constants::DiWheelDrive::PROX_WHEEL_RIGHT] == GREY) {
+			// turn right
+			copyRpmSpeed(rpmTurnRight, rpmFuzzyCtrl);
+		}
+	// no sensor detects anything 
+	} else {
+		// line is lost -> stop
+		copyRpmSpeed(rpmHalt, rpmFuzzyCtrl);
 	}
 
 	return;
@@ -371,7 +411,7 @@ UserThread::main()
             setRpmSpeed(rpmFuzzyCtrl);
         }
 
-		this->sleep(MS2ST(100));
+		this->sleep(MS2ST(10));
 	}
 
   return RDY_OK;

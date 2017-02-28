@@ -178,7 +178,7 @@ extern "C" {
   void boardInit(void);
   void boardRequestShutdown(void);
   void boardStandby(void);
-  void boardClearI2CBus(const uint8_t scl_pad);
+  void boardClearI2CBus(const uint8_t scl_pad, const uint8_t sda_pad);
 #ifdef __cplusplus
 }
 #endif

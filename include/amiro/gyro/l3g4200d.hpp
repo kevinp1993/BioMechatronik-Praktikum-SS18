@@ -15,6 +15,7 @@ class L3G4200D : public chibios_rt::BaseStaticThread<256> {
     DR_200_HZ   = 0x40,
     DR_400_HZ   = 0x80,
     DR_800_HZ   = 0xC0,
+    DR_MASK     = 0xC0,
   };
   enum {
     BW_12_5  = 0x00,
@@ -25,12 +26,14 @@ class L3G4200D : public chibios_rt::BaseStaticThread<256> {
     BW_50    = 0x20,
     BW_70    = 0x30,
     BW_110   = 0x30,
+    BW_MASK  = 0x30,
   };
   enum {
-    PD  = 0x08,
-    ZEN = 0x04,
-    YEN = 0x02,
-    XEN = 0x01,
+    PD       = 0x08,
+    ZEN      = 0x04,
+    YEN      = 0x02,
+    XEN      = 0x01,
+    EN_MASK  = 0x0F,
   };
   enum {
     HPM_NORMAL_RST = 0x00,
@@ -73,6 +76,7 @@ class L3G4200D : public chibios_rt::BaseStaticThread<256> {
     ST_EN       = 0x02,
     SIM_3W      = 0x01,
     SIM_4W      = 0x00,
+    FS_MASK     = 0x20,
   };
   enum {
     BOOT          = 0x80,
@@ -224,8 +228,14 @@ class L3G4200D : public chibios_rt::BaseStaticThread<256> {
   chibios_rt::EvtSource* getEventSource();
   msg_t configure(const L3G4200DConfig* config);
   int16_t angularRate[AXIS_Z - AXIS_X + 1];
+  int32_t angular[AXIS_Z - AXIS_X + 1];
 
   int16_t getAngularRate(const uint8_t axis);
+  
+  int32_t getAngularRate_udps(const uint8_t axis);
+  int32_t getAngular(const uint8_t axis);
+  int32_t getAngular_ud(const uint8_t axis);
+  void angularReset();
 
 
   /**
@@ -240,11 +250,17 @@ class L3G4200D : public chibios_rt::BaseStaticThread<256> {
 
  private:
   inline void updateSensorData();
+  inline void calcAngular();
 
  private:
 
   HWSPIDriver* driver;
   chibios_rt::EvtSource eventSource;
+  uint32_t integrationTic;
+  uint32_t udpsPerTic; // Resolution: Micro-degree-per-second per digit
+  uint32_t period_us;
+  uint32_t period_ms;
+  systime_t period_st;
 
 };
 

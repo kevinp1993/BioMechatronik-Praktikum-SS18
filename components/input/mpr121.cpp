@@ -1,5 +1,6 @@
 #include <amiro/bus/i2c/I2CDriver.hpp>
 #include <amiro/input/mpr121.hpp>
+#include <amiro/Constants.h>
 
 namespace amiro {
 
@@ -171,7 +172,7 @@ main(void) {
 
     this->eventSource.broadcastFlags(0);
 
-    this->waitAnyEventTimeout(ALL_EVENTS, MS2ST(100));
+    this->waitAnyEventTimeout(ALL_EVENTS, CAN::UPDATE_PERIOD_MSEC);
   }
 
   return RDY_OK;

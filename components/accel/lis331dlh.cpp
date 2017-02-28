@@ -5,6 +5,7 @@
 #include <amiro/accel/lis331dlh.hpp>
 #include <chprintf.h>
 #include <cmath>  // abs()
+#include <amiro/Constants.h>
 
 namespace amiro {
 
@@ -72,7 +73,7 @@ main() {
 
     this->eventSource.broadcastFlags(0);
 
-    this->waitAnyEventTimeout(ALL_EVENTS, MS2ST(200));
+    this->waitAnyEventTimeout(ALL_EVENTS, CAN::UPDATE_PERIOD_MSEC);
 
   }
   return RDY_OK;

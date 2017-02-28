@@ -14,7 +14,7 @@ std::array<float, 8> proxNormalized;
 bool running;
 
 uint16_t constexpr proxThresholdLow = 0x0000;
-uint16_t constexpr proxThresholdHigh = 0x2000;
+uint16_t constexpr proxThresholdHigh = 0x1000;
 uint16_t constexpr proxRange = proxThresholdHigh - proxThresholdLow;
 
 std::array< std::array<float, 2>, 8> constexpr namMatrix = {
@@ -28,7 +28,7 @@ std::array< std::array<float, 2>, 8> constexpr namMatrix = {
     std::array<float, 2>/* ESE */{ 0.25f,  0.25f},
     std::array<float, 2>/* SSE */{ 0.00f,  0.00f}
 };
-uint32_t constexpr baseTranslation = 50e3; // 2cm/s
+uint32_t constexpr baseTranslation = 100e3; // 2cm/s
 uint32_t constexpr baseRotation = 1e6; // 1rad/s
 types::kinematic constexpr defaultKinematic = {
     /*  x  [µm/s]   */ baseTranslation,
@@ -161,7 +161,7 @@ UserThread::main()
             global.robot.setTargetSpeed(kinematic);
         }
 
-        this->sleep(MS2ST(100));
+        this->sleep(MS2ST(10));
     }
 
   return RDY_OK;

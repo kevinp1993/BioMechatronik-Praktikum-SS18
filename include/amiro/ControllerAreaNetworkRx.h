@@ -20,6 +20,8 @@ namespace amiro {
     types::position getOdometry();
     types::power_status& getPowerStatus();
     uint8_t getRobotID();
+    int32_t getMagnetometerValue(int axis);
+    int16_t getGyroscopeValue(int axis);
 
     void calibrateProximityRingValues();
     void calibrateProximityFloorValues();
@@ -38,6 +40,8 @@ namespace amiro {
     uint16_t proximityRingValue[8];
     int actualSpeed[2];
     uint16_t proximityFloorValue[4];
+    int32_t magnetometerValue[3];
+    int16_t gyroscopeValue[3];
     types::position robotPosition;
     types::power_status powerStatus;
     uint8_t robotId;

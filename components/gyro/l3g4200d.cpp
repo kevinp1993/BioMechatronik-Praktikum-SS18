@@ -1,14 +1,23 @@
+#include <ch.hpp>
+#include <hal.h>
+#include <chprintf.h>
 #include <string.h>
 
 #include <amiro/util/util.h>
 #include <amiro/bus/spi/HWSPIDriver.hpp>
 #include <amiro/gyro/l3g4200d.hpp>
+#include <amiro/Constants.h>
+
+using namespace chibios_rt;
 
 namespace amiro {
 
 L3G4200D::L3G4200D(HWSPIDriver *driver)
-    : driver(driver) {
-
+    : driver(driver),
+      udpsPerTic(175000),
+      period_us(100000) {
+  this->period_ms = this->period_us * 1e-3;
+  this->period_st = US2ST(this->period_us);
 }
 
 L3G4200D::~L3G4200D() {
@@ -21,17 +30,22 @@ L3G4200D::getEventSource() {
 }
 
 msg_t L3G4200D::main() {
-
-  this->setName("L3g4200d");
+  systime_t time = System::getTime();
+  this->setName("l3g4200d");
 
   while (!this->shouldTerminate()) {
+	time += this->period_st;
 
     updateSensorData();
+    calcAngular();
 
     this->eventSource.broadcastFlags(1);
 
-    this->waitAnyEventTimeout(ALL_EVENTS, MS2ST(200));
-
+    if (time >= System::getTime()) {
+      chThdSleepUntil(time);
+    } else {
+      chprintf((BaseSequentialStream*) &SD1, "WARNING l3g4200d: Unable to keep track\r\n");
+	}
   }
   return RDY_OK;
 }
@@ -39,10 +53,50 @@ msg_t L3G4200D::main() {
 int16_t
 L3G4200D::
 getAngularRate(const uint8_t axis) {
-
   return this->angularRate[axis];
-
 }
+
+int32_t
+L3G4200D::
+getAngularRate_udps(const uint8_t axis) {
+  return uint32_t(this->angularRate[axis]) * this->udpsPerTic;
+}
+
+int32_t
+L3G4200D::
+getAngular(const uint8_t axis) {
+  return this->angular[axis];
+}
+
+int32_t
+L3G4200D::
+getAngular_ud(const uint8_t axis) {
+  const int32_t angularRate_mdps = this->getAngularRate_udps(axis) * 1e-3;
+  return angularRate_mdps * (this->integrationTic * this->period_ms);
+}
+
+void
+L3G4200D::
+calcAngular() {
+  // Need to check for overflow!
+  ++this->integrationTic;
+  chSysLock();
+  this->angular[L3G4200D::AXIS_X] += int32_t(this->angularRate[L3G4200D::AXIS_X]);
+  this->angular[L3G4200D::AXIS_Y] += int32_t(this->angularRate[L3G4200D::AXIS_Y]);
+  this->angular[L3G4200D::AXIS_Z] += int32_t(this->angularRate[L3G4200D::AXIS_Z]);
+  chSysUnlock();
+}
+
+// TODO: Outsource, so that everyone who needs this has an own instance of the integrator
+void
+L3G4200D::
+angularReset() {
+  this->angular[L3G4200D::AXIS_X] = 0;
+  this->angular[L3G4200D::AXIS_Y] = 0;
+  this->angular[L3G4200D::AXIS_Z] = 0;
+  this->integrationTic = 0;
+}
+
 
 void L3G4200D::updateSensorData() {
 
@@ -62,6 +116,7 @@ void L3G4200D::updateSensorData() {
   // assemble data
   sreg = buffer[1];
 
+  chSysLock();
   if (sreg & L3G4200D::XDA)
     this->angularRate[L3G4200D::AXIS_X] = (buffer[3] << 8) + buffer[2];
 
@@ -70,7 +125,7 @@ void L3G4200D::updateSensorData() {
 
   if (sreg & L3G4200D::ZDA)
     this->angularRate[L3G4200D::AXIS_Z] = (buffer[7] << 8) + buffer[6];
-
+  chSysUnlock();
 }
 
 msg_t L3G4200D::configure(const L3G4200DConfig *config) {
@@ -95,6 +150,25 @@ msg_t L3G4200D::configure(const L3G4200DConfig *config) {
   buffer[5] = config->ctrl5;
   this->driver->write(buffer, 6);
 
+  // Handle the new update time
+  switch(config->ctrl1 & L3G4200D::DR_MASK) {
+    case L3G4200D::DR_100_HZ: this->period_us = 10000; break;
+    case L3G4200D::DR_200_HZ: this->period_us =  5000; break;
+    case L3G4200D::DR_400_HZ: this->period_us =  2500; break;
+    case L3G4200D::DR_800_HZ: this->period_us =  1250; break;
+  }
+  this->period_st = US2ST(this->period_st);
+
+  // Handle the new full scale
+  switch(config->ctrl1 & L3G4200D::FS_MASK) {
+    case L3G4200D::FS_250_DPS:  this->udpsPerTic =  8750; break;
+    case L3G4200D::FS_500_DPS:  this->udpsPerTic = 17500; break;
+    case L3G4200D::FS_2000_DPS: this->udpsPerTic = 70000; break;
+  }
+
+  // Reset the integration
+  this->angularReset();
+    
   return RDY_OK;
 
 }

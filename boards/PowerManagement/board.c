@@ -146,15 +146,49 @@ inline void boardWakeup(void) {
   palSetPad(GPIOC, GPIOC_SYS_PD_N);
 }
 
-inline void boardClearI2CBus(const uint8_t scl_pad) {
+inline void boardClearI2CBus(const uint8_t scl_pad, const uint8_t sda_pad) {
 
   uint8_t i;
 
-  // configure I²C SCL open drain
+  // configure I²C SCL and SDA open drain
   palSetPadMode(GPIOB, scl_pad, PAL_MODE_OUTPUT_OPENDRAIN);
+  palSetPadMode(GPIOB, sda_pad, PAL_MODE_OUTPUT_OPENDRAIN);
 
-  // perform bus clear as per I²C Specification v5 3.1.16
-  for (i = 0x00u; i < 0x09u; i++) {
+  // perform a 2-wire software reset for the eeprom (see AT24C01BN-SH-B datasheet, chapter 3)
+  // note: clock is ~50kHz (20us per cycle)
+  palSetPad(GPIOB, sda_pad);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palSetPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  for (i = 0; i < 9; ++i) {
+    palSetPad(GPIOB, scl_pad);
+    chThdSleepMicroseconds(10);
+    palClearPad(GPIOB, scl_pad);
+    chThdSleepMicroseconds(10);
+  }
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+  palSetPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(5);
+  palSetPad(GPIOB, sda_pad);
+  chThdSleepMicroseconds(5);
+  palClearPad(GPIOB, scl_pad);
+  chThdSleepMicroseconds(10);
+
+  // perform bus clear as per I²C Specification v6 3.1.16
+  // note: clock is 100kHz (10us per cycle)
+  for (i = 0; i < 10; i++) {
     palClearPad(GPIOB, scl_pad);
     chThdSleepMicroseconds(5);
     palSetPad(GPIOB, scl_pad);
@@ -163,5 +197,23 @@ inline void boardClearI2CBus(const uint8_t scl_pad) {
 
   // reconfigure I²C SCL
   palSetPadMode(GPIOB, scl_pad, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
+  palSetPadMode(GPIOB, sda_pad, PAL_MODE_ALTERNATE(4) | PAL_STM32_OTYPE_OPENDRAIN);
 
+  return;
+}
+
+inline void boardResetBQ27500I2C(const uint8_t scl_pad, const uint8_t sda_pad) {
+
+  // configure I²C SCL and SDA open drain
+  palSetPadMode(GPIOB, scl_pad, PAL_MODE_OUTPUT_OPENDRAIN);
+  palSetPadMode(GPIOB, sda_pad, PAL_MODE_OUTPUT_OPENDRAIN);
+
+  // BQ27500: reset by holding bus low for t_BUSERR (17.3 - 21.2 seconds)
+  palClearPad(GPIOB, scl_pad);
+  palClearPad(GPIOB, sda_pad);
+  chThdSleepSeconds(20);
+
+  boardClearI2CBus(scl_pad, sda_pad);
+
+  return;
 }

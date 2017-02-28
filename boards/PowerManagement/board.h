@@ -375,7 +375,8 @@ extern "C" {
   void boardStandby(void);
   void boardStop(const uint8_t lpds, const uint8_t fpds);
   void boardWakeup(void);
-  void boardClearI2CBus(const uint8_t scl_pad);
+  void boardClearI2CBus(const uint8_t scl_pad, const uint8_t sda_pad);
+  void boardResetBQ27500I2C(const uint8_t scl_pad, const uint8_t sda_pad);
 #ifdef __cplusplus
 }
 #endif

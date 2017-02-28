@@ -55,7 +55,7 @@ public:
     /* command             */ VCNL4020::ALS_EN | VCNL4020::PROX_EN | VCNL4020::SELFTIMED_EN,
     /* ambient parameter   */ VCNL4020::AMBIENT_RATE_2 | VCNL4020::AMBIENT_AUTO_OFFSET | VCNL4020::AMBIENT_AVG_32,
     /* IR LED current [mA] */ 200u,
-    /* proximity rate      */ VCNL4020::PROX_RATE_7_8125
+    /* proximity rate      */ VCNL4020::PROX_RATE_125
   };
 
   /**
@@ -190,7 +190,7 @@ public:
     increments(&QEID3, &QEID4),
     motorcontrol(&PWMD2, &increments, GPIOB, GPIOB_POWER_EN, &memory),
     distcontrol(&motorcontrol, &increments),
-    odometry(&increments),
+    odometry(&increments, &l3g4200d),
     sercanmux1(&SD1, &CAND1, CAN::DI_WHEEL_DRIVE_ID),
     robot(&CAND1),
     userThread()

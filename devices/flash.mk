@@ -4,7 +4,9 @@ DiWheelDrive := 1
 PowerManagement := 2
 LightRing := 3
 
-SERIALBOOT ?= SerialBoot
+SERIALBOOT ?= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../amiro-blt/Host/Source/SerialBoot/build/SerialBoot
+$(info $(SERIALBOOT))
+
 ifeq ($(OS),Windows_NT)
 	SERIALBOOT_PORT ?= COM4
 else
@@ -16,7 +18,6 @@ SERIALBOOT_BAUDRATE ?= 115200
 
 #SERIALBOOT_BT_ADDR ?= 00:00:00:00:00:00
 SERIALBOOT_BT_ADDR ?= 00:07:80:44:23:F9
-
 
 ifdef PROJECT
 	DEVICES :=

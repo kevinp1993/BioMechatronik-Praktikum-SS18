@@ -792,8 +792,8 @@ int main(void) {
    */
   BaseThread::sleep(MS2ST(2000));
 
-  boardClearI2CBus(GPIOB_COMPASS_SCL);
-  boardClearI2CBus(GPIOB_IR_SCL);
+  boardClearI2CBus(GPIOB_COMPASS_SCL, GPIOB_COMPASS_SDA);
+  boardClearI2CBus(GPIOB_IR_SCL, GPIOB_IR_SDA);
 
   global.HW_I2C1.start(&global.i2c1_config);
   global.HW_I2C2.start(&global.i2c2_config);

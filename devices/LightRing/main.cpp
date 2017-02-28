@@ -514,7 +514,7 @@ int main(void) {
 
   extStart(&EXTD1, &extcfg);
 
-  boardClearI2CBus(GPIOB_MEM_SCL);
+  boardClearI2CBus(GPIOB_MEM_SCL, GPIOB_MEM_SDA);
 
   global.HW_I2C2.start(&global.i2c2_config);
 

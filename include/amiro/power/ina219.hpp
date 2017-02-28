@@ -140,6 +140,7 @@ namespace amiro {
         Status() {bus_voltage.value = 0; power = 0;}
       };
 
+    public:
       enum RegisterAddress {
         REG_CONFIGURATION = 0x00u,
         REG_SHUNT_VOLTAGE = 0x01u,
@@ -149,6 +150,7 @@ namespace amiro {
         REG_CALIBRATION = 0x05u
       };
 
+    private:
       enum RegisterMask {
         MASK_CONFIGURATION = 0x3FFFu,
         MASK_CALIBRATION = 0xFFFEu,
@@ -204,13 +206,14 @@ namespace amiro {
 
       uint8_t reset();
 
-  protected:
+    protected:
       virtual msg_t main(void);
 
-    private:
+    public:
       msg_t readRegister(const RegisterAddress reg, uint16_t& dst);
       msg_t writeRegister(const RegisterAddress reg, const uint16_t& val);
 
+    private:
       static inline INA219::BusVoltage busVoltageReg2uV(const INA219::Driver::BusVoltage reg_val)
       {
         INA219::BusVoltage bus_voltage;

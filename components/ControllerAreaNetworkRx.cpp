@@ -99,6 +99,36 @@ msg_t ControllerAreaNetworkRx::receiveSensorVal(CANRxFrame *frame) {
       }
       break;
 
+    case CAN::MAGNETOMETER_X_ID:
+      if (frame->DLC == 4) {
+        magnetometerValue[0] = frame->data32[0];
+        return RDY_OK;
+      }
+      break;
+
+    case CAN::MAGNETOMETER_Y_ID:
+      if (frame->DLC == 4) {
+        magnetometerValue[1] = frame->data32[0];
+        return RDY_OK;
+      }
+      break;
+
+    case CAN::MAGNETOMETER_Z_ID:
+      if (frame->DLC == 4) {
+        magnetometerValue[2] = frame->data32[0];
+        return RDY_OK;
+      }
+      break;
+
+    case CAN::GYROSCOPE_ID:
+      if (frame->DLC == 6) {
+        gyroscopeValue[0] = frame->data16[0];
+        gyroscopeValue[1] = frame->data16[1];
+        gyroscopeValue[2] = frame->data16[2];
+        return RDY_OK;
+      }
+      break;
+
     default:
       break;
   }
@@ -125,6 +155,16 @@ power_status &ControllerAreaNetworkRx::getPowerStatus() {
 
 uint8_t ControllerAreaNetworkRx::getRobotID() {
   return this->robotId;
+}
+
+int32_t ControllerAreaNetworkRx::getMagnetometerValue(int axis)
+{
+  return this->magnetometerValue[axis];
+}
+
+int16_t ControllerAreaNetworkRx::getGyroscopeValue(int axis)
+{
+  return this->gyroscopeValue[axis];
 }
 
 

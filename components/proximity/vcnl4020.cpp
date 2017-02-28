@@ -6,6 +6,7 @@
 #include <amiro/bus/i2c/I2CParams.hpp>
 #include <amiro/bus/i2c/I2CDriver.hpp>
 #include <amiro/proximity/vcnl4020.hpp>
+#include <amiro/Constants.h>
 
 using namespace chibios_rt;
 
@@ -107,7 +108,7 @@ main(void) {
 
     this->eventSource.broadcastFlags(0);
 
-    this->waitAnyEventTimeout(ALL_EVENTS, MS2ST(200));
+    this->waitAnyEventTimeout(ALL_EVENTS, CAN::UPDATE_PERIOD_MSEC);
   }
 
   return RDY_OK;

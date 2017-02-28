@@ -2,6 +2,7 @@
 #define AMIRO_ODOMETRY_H_
 
 #include <amiro/MotorControl.h>
+#include <amiro/gyro/l3g4200d.hpp>
 
 #include <Types.h> // types::position
 
@@ -13,8 +14,10 @@ namespace amiro {
      * Constructor
      *
      * @param mi object for retrieving the motor increments of the qei
+     * @param gyro object for retrieving the gyroscope data
+     * @param mc object for retrieving calibration parameters
      */
-    Odometry(MotorIncrements* mi);
+    Odometry(MotorIncrements* mi, L3G4200D* gyroscope);
 
     /**
      * Set the position of the roboter
@@ -74,7 +77,8 @@ namespace amiro {
      */
     void updateOdometry();
 
-    MotorIncrements* motorIncrements;
+    MotorIncrements* motorIncrements; // QEI driver
+    L3G4200D* gyro;  // Gyroscope driver
     chibios_rt::EvtSource eventSource;
     const unsigned int period;
     int incrementsPerRevolution;
