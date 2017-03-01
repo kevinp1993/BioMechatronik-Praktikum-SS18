@@ -5,7 +5,6 @@ PowerManagement := 2
 LightRing := 3
 
 SERIALBOOT ?= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))../../amiro-blt/Host/Source/SerialBoot/build/SerialBoot
-$(info $(SERIALBOOT))
 
 ifeq ($(OS),Windows_NT)
 	SERIALBOOT_PORT ?= COM4
