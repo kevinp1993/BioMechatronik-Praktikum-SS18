@@ -1,4 +1,4 @@
-DEVICES := DiWheelDrive LightRing PowerManagement
+DEVICES := DiWheelDrive PowerManagement LightRing
 
 DiWheelDrive := 1
 PowerManagement := 2
