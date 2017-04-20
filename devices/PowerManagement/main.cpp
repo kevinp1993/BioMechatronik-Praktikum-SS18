@@ -45,6 +45,13 @@ using namespace constants::PowerManagement;
 
 Global global;
 
+struct blVersion_t {
+  const uint8_t identifier;
+  const uint8_t major;
+  const uint8_t minor;
+  const uint8_t patch;
+} __attribute__((packed));
+
 void shutdownTimeoutISR(void *arg) {
 
   (void) arg;
@@ -828,26 +835,24 @@ void shellSwitchBoardCmd(BaseSequentialStream *chp, int argc, char *argv[]) {
 
 void shellRequestGetBootloaderInfo(BaseSequentialStream* chp, int argc, char *argv[]) {
   // check the magic number
-  if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == BL_MAGIC_NUMBER) {
-    chprintf(chp, "Bootloader version:  %u.%u.%u\n",
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))),
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (3*4))));
-    chprintf(chp, "Callback functions:\n");
-    if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 2) {
-      chprintf(chp, "\thibernate:      %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (4*4))) ? "available" : "unsupported");
-      chprintf(chp, "\tdeepsleep:      %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (5*4))) ? "available" : "unsupported");
-      chprintf(chp, "\ttransportation: %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (6*4))) ? "available" : "unsupported");
-      chprintf(chp, "\trestart:        %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (10*4))) ? "available" : "unsupported");
-    } else if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 3) {
-      chprintf(chp, "\thibernate:      %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (4*4))) ? "available" : "unsupported");
-      chprintf(chp, "\tdeepsleep:      %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (5*4))) ? "available" : "unsupported");
-      chprintf(chp, "\ttransportation: %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (6*4))) ? "available" : "unsupported");
-      chprintf(chp, "\trestart:        %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (7*4))) ? "available" : "unsupported");
-      chprintf(chp, "\thandle request: %s\n", *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (8*4))) ? "available" : "unsupported");
-    }
-  } else {
-    chprintf((BaseSequentialStream*) &SD1, "Bootloader deprecated\n");
+  switch (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR))) {
+    case (('A'<<24) | ('-'<<16) | ('B'<<8) | ('L'<<0)):
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader %u.%u.%u\n",
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->major,
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor,
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->patch);
+      break;
+
+    case BL_MAGIC_NUMBER:
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader %u.%u.%u\n",
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))));
+      break;
+
+    default:
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader incompatible\n");
+      break;
   }
 
   return;
@@ -951,13 +956,24 @@ int main(void) {
 
   chprintf((BaseSequentialStream*) &SD1, "\n");
   chprintf((BaseSequentialStream*) &SD1, BOARD_NAME " " BOARD_VERSION "\n");
-  if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == BL_MAGIC_NUMBER) {
-    chprintf((BaseSequentialStream*) &SD1, "Bootloader %u.%u.%u\n",
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))),
-             *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (3*4))));
-  } else {
-    chprintf((BaseSequentialStream*) &SD1, "Bootloader deprecated\n");
+  switch (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR))) {
+    case (('A'<<24) | ('-'<<16) | ('B'<<8) | ('L'<<0)):
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader %u.%u.%u\n",
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->major,
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor,
+               ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->patch);
+      break;
+
+    case BL_MAGIC_NUMBER:
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader %u.%u.%u\n",
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))),
+               *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))));
+      break;
+
+    default:
+      chprintf((BaseSequentialStream*) &SD1, "Bootloader incompatible\n");
+      break;
   }
   chprintf((BaseSequentialStream*) &SD1, "ChibiOS " CH_KERNEL_VERSION "\n");
   // make sure that the info text is completetly printed
@@ -1084,12 +1100,14 @@ int main(void) {
      * next wall or something like that.
      */
     if (shutdown_now != SHUTDOWN_NONE) {
-      if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) != BL_MAGIC_NUMBER) {
+      if ((*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) != (('A'<<24) | ('-'<<16) | ('B'<<8) | ('L'<<0))) && (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) != BL_MAGIC_NUMBER)) {
         chprintf((BaseSequentialStream*) &SD1, "ERROR: unable to shut down (bootloader deprecated).\n");
         shutdown_now = SHUTDOWN_NONE;
       } else {
         uint32_t blCallbackPtrAddr = BL_CALLBACK_TABLE_ADDR;
-        if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 2) {
+        // handle bootloader version 0.2.x
+        if ((*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == BL_MAGIC_NUMBER) &&
+            (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 2)) {
           switch (shutdown_now) {
             case SHUTDOWN_TRANSPORTATION:
               blCallbackPtrAddr += 6 * 4;
@@ -1108,7 +1126,34 @@ int main(void) {
               blCallbackPtrAddr = 0;
               break;
           }
-        } else if (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 3) {
+        }
+        // handle bootloader version 0.3.x
+        else if ((*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == BL_MAGIC_NUMBER) &&
+                 (*((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (1*4))) == 0 && *((uint32_t*)(BL_CALLBACK_TABLE_ADDR + (2*4))) == 3)) {
+          switch (shutdown_now) {
+            case SHUTDOWN_TRANSPORTATION:
+              blCallbackPtrAddr += 6 * 4;
+              break;
+            case SHUTDOWN_DEEPSLEEP:
+              blCallbackPtrAddr += 5 * 4;
+              break;
+            case SHUTDOWN_HIBERNATE:
+              blCallbackPtrAddr += 4 * 4;
+              break;
+            case SHUTDOWN_RESTART:
+              blCallbackPtrAddr += 7 * 4;
+              break;
+            case SHUTDOWN_HANDLE_REQUEST:
+              blCallbackPtrAddr += 8 * 4;
+              break;
+            default:
+              blCallbackPtrAddr = 0;
+              break;
+          }
+        }
+        // handle bootloader version 1.0.x
+        else if ((*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == (('A'<<24) | ('-'<<16) | ('B'<<8) | ('L'<<0))) &&
+                 ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->major == 1 && ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor == 0) {
           switch (shutdown_now) {
             case SHUTDOWN_TRANSPORTATION:
               blCallbackPtrAddr += 6 * 4;
@@ -1132,7 +1177,7 @@ int main(void) {
         }
 
         void (*blCallback)(void) = NULL;
-        if (blCallbackPtrAddr) {
+        if (blCallbackPtrAddr > BL_CALLBACK_TABLE_ADDR) {
           blCallback = (void (*)(void))(*((uint32_t*)blCallbackPtrAddr));
 
           if (!blCallback) {
