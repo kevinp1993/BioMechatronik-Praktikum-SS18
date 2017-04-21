@@ -8,7 +8,7 @@
 
 namespace amiro {
 
-  class Odometry : public chibios_rt::BaseStaticThread<512> {
+  class Odometry : public chibios_rt::BaseStaticThread<1024> {
   public:
     /**
      * Constructor

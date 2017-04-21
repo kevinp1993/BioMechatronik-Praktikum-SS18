@@ -16,7 +16,7 @@ using namespace constants::DiWheelDrive;
 
 
 Odometry::Odometry(MotorIncrements* mi, L3G4200D* gyroscope)
-    : BaseStaticThread<512>(),
+    : BaseStaticThread<1024>(),
       motorIncrements(mi),
       gyro(gyroscope),
       eventSource(),

@@ -2,6 +2,7 @@
 
 #include "global.hpp"
 #include <array>
+#include <chprintf.h>
 
 using namespace amiro;
 
