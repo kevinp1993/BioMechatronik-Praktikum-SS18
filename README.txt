@@ -81,7 +81,6 @@ copy of that project as well. Furthermore, AMiRo-OS requires a compatible
 bootloader, such as provided by the AMiRo-BLT project.
 
 
-
 1.1 GCC ARM Embedded Toolchain
 ------------------------------
 
