@@ -60,9 +60,10 @@ the source code, and flash it to the AMiRo modules.
 
 CONTENTS:
  1  Required software
-   1.1  GCC ARM Embedded Toolchain
-   1.2  ChibiOS
-   1.3  AMiRo-BLT
+   1.1  Git
+   1.2  GCC ARM Embedded Toolchain
+   1.3  ChibiOS
+   1.4  AMiRo-BLT
  2  Recommended software
    2.1  gtkterm and hterm
    2.2  QtCreator
@@ -81,7 +82,14 @@ copy of that project as well. Furthermore, AMiRo-OS requires a compatible
 bootloader, such as provided by the AMiRo-BLT project.
 
 
-1.1 GCC ARM Embedded Toolchain
+1.1 - Git
+---------
+
+Since all main- and subprojects are available as Git repositories, installing a
+recent version of the tool is mandatory.
+
+
+1.2 GCC ARM Embedded Toolchain
 ------------------------------
 
 Various versions of the GCC for ARM embedded devices can be found at
@@ -90,8 +98,15 @@ version 4.8 with update 2014-q1 since some others will cause issues. For
 installation of the compiler toolchain, please follow the instructions that can
 be found on the web page.
 
+If you are running a 64-bit operating system, you will have to install several
+32-bit libraries in order to make the compiler work. The required packages are
+libc6, libstdc++6, and libncurses5. You can run the following shell commands to
+install the according 32-bit versions of the packages:
+  >$ sudo dpkg --add-architecture i386 && sudo apt-get update
+  >$ sudo apt-get install libc6:i386 libstdc++6:i386 libncurses5:i386
 
-1.2 ChibiOS
+
+1.3 ChibiOS
 -----------
 
 Since AMiRo-OS uses ChibiOS as underlying system kernel, you need to acquire a
@@ -115,7 +130,7 @@ incompatible version of ChibiOS (try to checkout the correct commit as denoted
 above).
 
 
-1.3 AMiRo-BLT
+1.4 AMiRo-BLT
 -------------
 
 AMiRo-BLT is an additional software project, which is developed in parallel with
