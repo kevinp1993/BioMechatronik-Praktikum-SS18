@@ -26,7 +26,7 @@ University, which is funded by the German Research Foundation (DFG).
 Authors:
  - Thomas Schöpping        <tschoepp[at]cit-ec.uni-bielefeld.de>
  - Timo Korthals           <tkorthals[at]cit-ec.uni-bielefeld.de>
- - Stefan Herbechtsmeier   <sherbrec[at]cit-ec.uni-bielefeld.de>
+ - Stefan Herbrechtsmeier  <sherbrec[at]cit-ec.uni-bielefeld.de>
  - Teerapat Chinapirom     <tchinapirom[at]cit-ec.uni-bielefeld.de>
  - Robert Abel
  - Marvin Barther
