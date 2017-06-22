@@ -670,6 +670,9 @@ return;
 }
 
 void shellRequestMotorCalibrate(BaseSequentialStream *chp, int argc, char *argv[]) {
+  global.motorcontrol.resetGains();
+  chprintf((BaseSequentialStream*)&global.sercanmux1, "motor calibration starts in five seconds...\n");
+  BaseThread::sleep(MS2ST(5000));
   global.motorcontrol.isCalibrating = true;
 
   return;
@@ -677,6 +680,12 @@ void shellRequestMotorCalibrate(BaseSequentialStream *chp, int argc, char *argv[
 
 void shellRequestMotorGetGains(BaseSequentialStream *chp, int argc, char *argv[]){
   global.motorcontrol.printGains();
+
+  return;
+}
+
+void shellRequestMotorResetGains(BaseSequentialStream *chp, int argc, char *argv[]) {
+  global.motorcontrol.resetGains();;
 
   return;
 }
@@ -706,6 +715,7 @@ static const ShellCommand commands[] = {
   {"motor_stop", shellRequestMotorStop},
   {"motor_calibrate", shellRequestMotorCalibrate},
   {"motor_getGains", shellRequestMotorGetGains},
+  {"motor_resetGains", shellRequestMotorResetGains},
   {NULL, NULL}
 };
 

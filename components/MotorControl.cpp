@@ -434,6 +434,25 @@ void MotorControl::printGains(){
     chprintf((BaseSequentialStream*)&SD1, "dGain %f\n", this->dGain );
 }
 
+void MotorControl::resetGains()
+{
+  // reset factors
+  chSysLock();
+  this->motorCalibrationFactor = 1.0f;
+  this->pGain = 1000;
+  this->iGain = 0.08f;
+  this->dGain = 0.01f;
+  chSysUnlock();
+
+  // write reset factors to memory
+  this->memory->setwheelfactor(this->motorCalibrationFactor);
+  this->memory->setpGain(this->pGain);
+  this->memory->setiGain(this->iGain);
+  this->memory->setdGain(this->dGain);
+
+  return;
+}
+
 
 
 void MotorControl::calcVelocity() {

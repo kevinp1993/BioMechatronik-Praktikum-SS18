@@ -130,6 +130,11 @@ namespace amiro {
      */
     void printGains();
 
+    /**
+     * @brief Resets control gains.
+     */
+    void resetGains();
+
   protected:
     virtual msg_t main(void);
 
