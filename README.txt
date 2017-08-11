@@ -137,7 +137,9 @@ AMiRo-BLT is an additional software project, which is developed in parallel with
 AMiRo-OS. If you did not receive a copy of AMiRo-BLT with AMiRo-OS, you can find
 all code and documentation at <https://opensource.cit-ec.de/projects/amiro-os>.
 Instructions for installation and how to use the software provided by AMiRo-BLT
-can be found on the web page or in the project's readme file.
+can be found on the web page or in the project's readme file. It is highly
+recommended to install AMiRo-BLT in the same directory as AMiRo-OS and ChibiOS
+and name its root directory 'amiro-blt'.
 
 
 
@@ -193,9 +195,11 @@ use the makefile in the ./devices/ folder.
 
 After compilation, you always have to flash the generated program to the robot.
 Therefore you need to install the SerialBoot tool provided by the AMiRo-BLT
-project. Furthermore the tool must be accessible globally under the environment
-variable 'SERIALBOOT'. You can do this by appending the following line to your
-~/.bashrc file:
+project. By default AMiRo-OS assumes AMiRo-BLT to be installed in the same
+folder and its root directory to be named 'amiro-blt'. If this is the case, it
+will automatically detect the SerialBoot tool. Otherwise the tool must be
+accessible globally under the environment variable 'SERIALBOOT'. You can make
+it so by appending the following line to your ~/.bashrc file:
 
   export SERIALBOOT=</absolute/path/to/the/SerialBoot/binary>
 
