@@ -48,8 +48,8 @@ WT12CheckUtility::msgPrint(const char* message, const uint16_t length)
 {
   if (length > 0)
   {
-    chSequentialStreamWrite((BaseSequentialStream*)&SD1, (uint8_t*)message, length);
-//    chprintf((BaseSequentialStream*) &SD1, "[%d]\n", length);
+    chSequentialStreamWrite((BaseSequentialStream*)&global.sercanmux1, (uint8_t*)message, length);
+//    chprintf((BaseSequentialStream*) &global.sercanmux1, "[%d]\n", length);
   }
   return;
 }
@@ -72,7 +72,7 @@ WT12CheckUtility::sendMessage(char* message, uint8_t link_id)
 {
   const uint16_t length = strlen(message);
   if (length >= 1 << 10) {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: message too long!\n", __FILE__ , __LINE__);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: message too long!\n", __FILE__ , __LINE__);
     return;
   }
 
@@ -116,7 +116,7 @@ WT12CheckUtility::receiveMessage(char* message, const uint16_t max_length)
 
   if (msg.head.length > max_length)
   {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: message too long (%d of max %d bytes)!\n", __FILE__ , __LINE__, msg.head.length, max_length);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: message too long (%d of max %d bytes)!\n", __FILE__ , __LINE__, msg.head.length, max_length);
 
     for (uint16_t i = 0; i < msg.head.length; ++i) {
       chSequentialStreamGet((BaseSequentialStream*)&SD3);
@@ -132,7 +132,7 @@ WT12CheckUtility::receiveMessage(char* message, const uint16_t max_length)
 
   if (uint8_t(msg.head.link_id ^ msg.n_link) != 0xFFu)
   {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: message link id does not match (0x%02X vs 0x%02X)!\n", __FILE__ , __LINE__, msg.head.link_id, msg.n_link);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: message link id does not match (0x%02X vs 0x%02X)!\n", __FILE__ , __LINE__, msg.head.link_id, msg.n_link);
   }
 
   return msg.head.length;
@@ -160,7 +160,7 @@ WT12CheckUtility::receiveMessages(char* message_buf, const uint16_t msg_buf_size
 //    }
 
     if (length_buf[msg_count] == 0) {
-      chprintf((BaseSequentialStream*) &SD1, "%s(%d): WARNING: receiving aborted after %d messages (%d bytes)\n", __FILE__ , __LINE__, msg_count, msg_pos);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): WARNING: receiving aborted after %d messages (%d bytes)\n", __FILE__ , __LINE__, msg_count, msg_pos);
       return msg_count;
     }
 
@@ -178,7 +178,7 @@ WT12CheckUtility::receiveMessages(char* message_buf, const uint16_t msg_buf_size
     }
 
     if (msg_count > len_buf_size) {
-      chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: maximum messages received (%d)!\n", __FILE__ , __LINE__, len_buf_size);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: maximum messages received (%d)!\n", __FILE__ , __LINE__, len_buf_size);
       return len_buf_size;
     }
 
@@ -201,9 +201,9 @@ WT12CheckUtility::receiveRaw(uint8_t* buffer, uint16_t num_bytes, const bool pri
   {
     for (i = 0; i < num_bytes; ++i)
     {
-      chprintf((BaseSequentialStream*) &SD1, "%02X ", buffer[i]);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%02X ", buffer[i]);
     }
-    chprintf((BaseSequentialStream*) &SD1, "\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
   }
 
   return;
@@ -217,7 +217,7 @@ WT12CheckUtility::receiveRawLine(const bool print)
   {
     byte = chSequentialStreamGet((BaseSequentialStream*) &SD3);
     if (print) {
-      chprintf((BaseSequentialStream*) &SD1, "%c", byte);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%c", byte);
     }
   }
 
@@ -233,7 +233,7 @@ WT12CheckUtility::clearMessageBuffer(const bool print)
     byte = sdGet(&SD3);
     //byte = chSequentialStreamGet((BaseSequentialStream*) &SD3);
     if (print) {
-      chprintf((BaseSequentialStream*) &SD1, "0x%02X <%c>\n", byte, byte);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "0x%02X <%c>\n", byte, byte);
     }
     BaseThread::sleep(MS2ST(1));
   }

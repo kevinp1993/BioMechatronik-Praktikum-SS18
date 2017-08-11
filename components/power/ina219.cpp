@@ -2,10 +2,13 @@
 
 #include <ch.hpp>
 #include <chprintf.h>
+#include <global.hpp>
 
 using namespace chibios_rt;
 using namespace amiro;
 using namespace INA219;
+
+extern Global global;
 
 Driver::Driver(I2CDriver &i2c_driver, const uint8_t i2c_address) :
   BaseSensor<InitData,CalibData>(), i2c_driver(&i2c_driver), tx_params({i2c_address, NULL, 0, NULL, 0}), current_lsb_uA(0)
@@ -225,10 +228,10 @@ Driver::selftest()
     bus_voltage = this->readBusVoltage();
     this->readRegister(REG_POWER, power);
   }
-  chprintf((BaseSequentialStream*) &SD1, "shunt voltage : %fV\n", this->readShuntVoltage_uV() / 1000000.f);
-  chprintf((BaseSequentialStream*) &SD1, "bus voltage   : %fV\n", bus_voltage.voltage_uV / 1000000.f);
-  chprintf((BaseSequentialStream*) &SD1, "power         : %fW\n", this->readPower_uW() / 1000000.f);
-  chprintf((BaseSequentialStream*) &SD1, "current       : %fA\n", this->readCurrent_uA() / 1000000.f);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "shunt voltage : %fV\n", this->readShuntVoltage_uV() / 1000000.f);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "bus voltage   : %fV\n", bus_voltage.voltage_uV / 1000000.f);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "power         : %fW\n", this->readPower_uW() / 1000000.f);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "current       : %fA\n", this->readCurrent_uA() / 1000000.f);
 
   return ST_OK;
 }
@@ -343,7 +346,7 @@ Driver::readRegister(const RegisterAddress reg, uint16_t& dst)
       dst &= MASK_CALIBRATION;
 #ifndef NDEBUG
   } else {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: i2c transmit failed (%d | 0x%08X)\n", __FILE__ , __LINE__ , res, this->i2c_driver->getErrors());
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: i2c transmit failed (%d | 0x%08X)\n", __FILE__ , __LINE__ , res, this->i2c_driver->getErrors());
 #endif
   }
 
@@ -366,7 +369,7 @@ Driver::writeRegister(const RegisterAddress reg, const uint16_t& val)
 
 #ifndef NDEBUG
   if (res) {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: i2c transmit failed (%d | 0x%08X)\n", __FILE__ , __LINE__ , res, this->i2c_driver->getErrors());
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: i2c transmit failed (%d | 0x%08X)\n", __FILE__ , __LINE__ , res, this->i2c_driver->getErrors());
   }
 #endif
 

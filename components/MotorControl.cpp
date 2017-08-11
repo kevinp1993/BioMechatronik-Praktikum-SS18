@@ -232,9 +232,9 @@ void MotorControl::calibrate() {
       System::getTime() - this->wheelCalibrationTime > 1500) {
     this->motorCalibrationFactor = (float)this->rightWValues[0]/(float)this->leftWValues[0];
 
-    chprintf((BaseSequentialStream*) &SD1, "motorCalibrationFactor =   %f  \n" ,this->motorCalibrationFactor);
-    chprintf((BaseSequentialStream*) &SD1, "rw =   %i  \n" ,this->rightWValues[0]);
-    chprintf((BaseSequentialStream*) &SD1, "lw =   %i  \n" ,this->leftWValues[0]);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "motorCalibrationFactor =   %f  \n" ,this->motorCalibrationFactor);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "rw =   %i  \n" ,this->rightWValues[0]);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "lw =   %i  \n" ,this->leftWValues[0]);
 
     this->pwmPercentage[LEFT_WHEEL] = 0;
     this->pwmPercentage[RIGHT_WHEEL] = 0;
@@ -257,7 +257,7 @@ void MotorControl::calibrateZiegler() {
     if (ziegler && ziegler2){
         this->targetVelocity.x = 200000 * ((zieglerHelp%2 == 0) ? 1 : -1);
         this->pGain = 1000 + 100 * zieglerHelp;
-        chprintf((BaseSequentialStream*) &SD1, "pgain =  %i  \n" , this->pGain);
+        chprintf((BaseSequentialStream*) &global.sercanmux1, "pgain =  %i  \n" , this->pGain);
         zieglerHelp++;
         ziegler = false;
         ziegler2 = false;
@@ -281,7 +281,7 @@ void MotorControl::calibrateZiegler() {
         zieglerHelp2++;
         if (zieglerHelp2 > 20){
            this->zieglerPeriod  = numberOfLastVelocitiesV * this->period / nsc;
-           chprintf((BaseSequentialStream*) &SD1, "zieglerPeriod =   %f  \n" ,this->zieglerPeriod);
+           chprintf((BaseSequentialStream*) &global.sercanmux1, "zieglerPeriod =   %f  \n" ,this->zieglerPeriod);
 
            this->targetVelocity.x = 0;
            this->pGain = (int) (this->pGain* 0.6);
@@ -290,9 +290,9 @@ void MotorControl::calibrateZiegler() {
            this->memory->setpGain(this->pGain);
            this->memory->setiGain(this->iGain);
            this->memory->setdGain(this->dGain);
-           chprintf((BaseSequentialStream*) &SD1, "pgain =   %i  \n" ,this->pGain);
-           chprintf((BaseSequentialStream*) &SD1, "igain =   %f  \n" ,this->iGain);
-           chprintf((BaseSequentialStream*) &SD1, "dgain =   %f  \n" ,this->dGain);
+           chprintf((BaseSequentialStream*) &global.sercanmux1, "pgain =   %i  \n" ,this->pGain);
+           chprintf((BaseSequentialStream*) &global.sercanmux1, "igain =   %f  \n" ,this->iGain);
+           chprintf((BaseSequentialStream*) &global.sercanmux1, "dgain =   %f  \n" ,this->dGain);
 
            this->motorCalibration = true;
            ziegler = true;
@@ -428,10 +428,10 @@ int MotorControl::getNumberofSignChanges(){
 }
 
 void MotorControl::printGains(){
-    chprintf((BaseSequentialStream*)&SD1, "motorCalibrationFactor %f\n", this->motorCalibrationFactor );
-    chprintf((BaseSequentialStream*)&SD1, "pGain %i\n", this->pGain );
-    chprintf((BaseSequentialStream*)&SD1, "iGain %f\n", this->iGain );
-    chprintf((BaseSequentialStream*)&SD1, "dGain %f\n", this->dGain );
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "motorCalibrationFactor %f\n", this->motorCalibrationFactor );
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "pGain %i\n", this->pGain );
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "iGain %f\n", this->iGain );
+    chprintf((BaseSequentialStream*)&global.sercanmux1, "dGain %f\n", this->dGain );
 }
 
 void MotorControl::resetGains()

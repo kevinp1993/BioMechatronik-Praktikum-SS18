@@ -9,10 +9,13 @@
 #include <Matrix.h> // Matrixoperations "Matrix::*"
 #include <amiro/Constants.h> // Constants "constants::*"
 #include <chprintf.h>
+#include <global.hpp>
 
 using namespace chibios_rt;
 using namespace amiro;
 using namespace constants::DiWheelDrive;
+
+extern Global global;
 
 
 Odometry::Odometry(MotorIncrements* mi, L3G4200D* gyroscope)
@@ -58,10 +61,10 @@ types::position Odometry::getPosition() {
     robotPosition.y = this->pY * 1e6;
     robotPosition.f_z = (int32_t(this->pPhi * 1e6) % piScaled) + ((this->pPhi < 0) ? piScaled : 0);  // Get only the postitve angel f_z in [0 .. 2 * pi]
   chSysUnlock();
-//     chprintf((BaseSequentialStream*) &SD1, "X:%d Y:%d Phi:%d", robotPosition.x,robotPosition.y, robotPosition.f_z);
-//     chprintf((BaseSequentialStream*) &SD1, "\r\n");
-//     chprintf((BaseSequentialStream*) &SD1, "X:%f Y:%f Phi:%f", this->pX,this->pY, this->pPhi);
-//     chprintf((BaseSequentialStream*) &SD1, "\r\n");
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "X:%d Y:%d Phi:%d", robotPosition.x,robotPosition.y, robotPosition.f_z);
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "\r\n");
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "X:%f Y:%f Phi:%f", this->pX,this->pY, this->pPhi);
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "\r\n");
   return robotPosition;
 }
 
@@ -110,18 +113,18 @@ msg_t Odometry::main(void) {
 
     // Calculate the odometry
     this->updateOdometry();
-		
 
-//     chprintf((BaseSequentialStream*) &SD1, "X:%f Y:%f Phi:%f", this->pX,this->pY, this->pPhi);
-//     chprintf((BaseSequentialStream*) &SD1, "\r\n");
-//     chprintf((BaseSequentialStream*) &SD1, "distance_left:%f distance_right:%f", this->distance[0],this->distance[1]);
-//     chprintf((BaseSequentialStream*) &SD1, "\r\n");
 
-	if (time >= System::getTime()) {
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "X:%f Y:%f Phi:%f", this->pX,this->pY, this->pPhi);
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "\r\n");
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "distance_left:%f distance_right:%f", this->distance[0],this->distance[1]);
+//     chprintf((BaseSequentialStream*) &global.sercanmux1, "\r\n");
+
+  if (time >= System::getTime()) {
       chThdSleepUntil(time);
     } else {
-      chprintf((BaseSequentialStream*) &SD1, "WARNING Odometry: Unable to keep track\r\n");
-	}
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "WARNING Odometry: Unable to keep track\r\n");
+  }
   }
 
   return true;
@@ -139,7 +142,7 @@ void Odometry::updateOdometry() {
     Matrix::copy<float>(this->Cp3x3,3,3,Cp3x3,3,3);
     // Get the differentail gyro information and reset it
     angular_ud = gyro->getAngular_ud(L3G4200D::AXIS_Z);
-	gyro->angularReset();
+  gyro->angularReset();
   chSysUnlock();
 
   ////////////////
@@ -237,11 +240,11 @@ void Odometry::updateDistance() {
   // Get the current increments of the QEI
   MotorControl::updateIncrements(this->motorIncrements, this->increment, this->incrementDifference);
 //
-//  chprintf((BaseSequentialStream*) &SD1, "\ni_right = %d \t i_left = %d", this->increment[RIGHT_WHEEL], this->increment[LEFT_WHEEL]);
-//  chprintf((BaseSequentialStream*) &SD1, "\niDiff_right = %d \t iDiff_left = %d", this->incrementDifference[RIGHT_WHEEL], this->incrementDifference[LEFT_WHEEL]);
+//  chprintf((BaseSequentialStream*) &global.sercanmux1, "\ni_right = %d \t i_left = %d", this->increment[RIGHT_WHEEL], this->increment[LEFT_WHEEL]);
+//  chprintf((BaseSequentialStream*) &global.sercanmux1, "\niDiff_right = %d \t iDiff_left = %d", this->incrementDifference[RIGHT_WHEEL], this->incrementDifference[LEFT_WHEEL]);
 
   // Get the driven distance for each wheel
   MotorControl::updateDistance(this->incrementDifference, this->distance);
 
-//  chprintf((BaseSequentialStream*) &SD1, "\nx_right = %f \t x_left = %f", this->distance[RIGHT_WHEEL], this->distance[LEFT_WHEEL]);
+//  chprintf((BaseSequentialStream*) &global.sercanmux1, "\nx_right = %f \t x_left = %f", this->distance[RIGHT_WHEEL], this->distance[LEFT_WHEEL]);
 }

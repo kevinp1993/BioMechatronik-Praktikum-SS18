@@ -5,8 +5,12 @@
 #include <amiro/Constants.h>
 #include <amiro/ControllerAreaNetworkRx.h>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
+
+extern Global global;
 
 using namespace types;
 using namespace amiro::constants;
@@ -36,7 +40,7 @@ ControllerAreaNetworkRx::
 msg_t ControllerAreaNetworkRx::receiveSensorVal(CANRxFrame *frame) {
   int deviceId = this->decodeDeviceId(frame);
 
-  // chprintf((BaseSequentialStream*) &SD1, "DeviceId: %d\r\n",deviceId);
+  // chprintf((BaseSequentialStream*) &global.sercanmux1, "DeviceId: %d\r\n",deviceId);
 
   switch (deviceId) {
     case CAN::PROXIMITY_RING_ID(0):
@@ -72,7 +76,7 @@ msg_t ControllerAreaNetworkRx::receiveSensorVal(CANRxFrame *frame) {
       break;
 
     case CAN::PROXIMITY_FLOOR_ID:
-      // chprintf((BaseSequentialStream*) &SD1, "CAN::PROXIMITY_FLOOR_ID");
+      // chprintf((BaseSequentialStream*) &global.sercanmux1, "CAN::PROXIMITY_FLOOR_ID");
       if (frame->DLC == 8) {
         proximityFloorValue[0] = frame->data16[0];
         proximityFloorValue[1] = frame->data16[1];
@@ -192,7 +196,7 @@ msg_t ControllerAreaNetworkRx::main(void) {
         CANRxFrame rxframe;
         msg_t message = canReceive(this->canDriver, CAN_ANY_MAILBOX, &rxframe, TIME_IMMEDIATE);
         if (message == RDY_OK) {
-          // chprintf((BaseSequentialStream*) &SD1, "Rx Message");
+          // chprintf((BaseSequentialStream*) &global.sercanmux1, "Rx Message");
           message = this->receiveMessage(&rxframe);
           if (message != RDY_OK)
             this->receiveSensorVal(&rxframe);

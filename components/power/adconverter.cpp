@@ -116,14 +116,14 @@ ADConverter::main()
 
         if (global.adc1_buffer[0] > uV2Adc(this->watchdog_threshold_uV))
         {
-          chprintf((BaseSequentialStream*)&SD1, "%f > 9V detected: now charging\n", ((float)adc2uV(global.adc1_buffer[0]))/1000000.0f);
+          chprintf((BaseSequentialStream*)&global.sercanmux1, "%f > 9V detected: now charging\n", ((float)adc2uV(global.adc1_buffer[0]))/1000000.0f);
           global.robot.getPowerStatus().charging_flags.content.vsys_higher_than_9V = true;
           global.bq24103a[constants::PowerManagement::BAT_P7]->enable(true);
           global.bq24103a[constants::PowerManagement::BAT_P8]->enable(true);
           this->conversion_group.htr = ADC_HTR_HT;
           this->conversion_group.ltr = ADC_LTR(uV2Adc(this->watchdog_threshold_uV));
         } else {
-          chprintf((BaseSequentialStream*)&SD1, "%f < 9V detected: not charging\n", ((float)adc2uV(global.adc1_buffer[0]))/1000000.0f);
+          chprintf((BaseSequentialStream*)&global.sercanmux1, "%f < 9V detected: not charging\n", ((float)adc2uV(global.adc1_buffer[0]))/1000000.0f);
           global.robot.getPowerStatus().charging_flags.content.vsys_higher_than_9V = false;
           this->conversion_group.htr = ADC_HTR(uV2Adc(this->watchdog_threshold_uV));
           this->conversion_group.ltr = 0;

@@ -6,8 +6,11 @@
 #include <chprintf.h>
 #include <cmath>  // abs()
 #include <amiro/Constants.h>
+#include <global.hpp>
 
 namespace amiro {
+
+extern Global global;
 
 LIS331DLH::
 LIS331DLH(HWSPIDriver *driver) :
@@ -238,7 +241,7 @@ printSelfTest(LIS331DLHConfig* config) {
   this->configure(&test_accel_run_cfg);
   BaseThread::sleep(MS2ST(sleepBetweenMeasurementMs));
   // Grep some values and build the mean value
-  chprintf((BaseSequentialStream*) &SD1, "\nACC: Get acc std values\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\nACC: Get acc std values\n");
   int32_t stdAccValues[3] = { this->getAcceleration(LIS331DLH::AXIS_X), this
       ->getAcceleration(LIS331DLH::AXIS_Y), this->getAcceleration(
       LIS331DLH::AXIS_Z) };
@@ -248,10 +251,10 @@ printSelfTest(LIS331DLHConfig* config) {
     for (uint8_t i = LIS331DLH::AXIS_X; i <= LIS331DLH::AXIS_Z; i++) {
       accel = int32_t(this->getAcceleration(i));
       stdAccValues[i] = (stdAccValues[i] * n + accel) / (n + 1);
-      chprintf((BaseSequentialStream*) &SD1, "%c%d:%d ", accel < 0 ? '-' : '+',
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%c%d:%d ", accel < 0 ? '-' : '+',
                 accel < 0 ? -accel : accel, stdAccValues[i]);
     }
-    chprintf((BaseSequentialStream*) &SD1, "\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
   }
 
   // 2. Apply negative offset
@@ -262,7 +265,7 @@ printSelfTest(LIS331DLHConfig* config) {
   this->configure(&test_accel_run_cfg);
   BaseThread::sleep(MS2ST(sleepBetweenMeasurementMs));
   // Grep some values and build the mean value
-  chprintf((BaseSequentialStream*) &SD1, "\nACC: Get acc neg values\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\nACC: Get acc neg values\n");
   int16_t negAccValues[3] = { this->getAcceleration(LIS331DLH::AXIS_X), this
       ->getAcceleration(LIS331DLH::AXIS_Y), this->getAcceleration(
       LIS331DLH::AXIS_Z) };
@@ -272,10 +275,10 @@ printSelfTest(LIS331DLHConfig* config) {
     for (uint8_t i = LIS331DLH::AXIS_X; i <= LIS331DLH::AXIS_Z; i++) {
       accel = int32_t(this->getAcceleration(i));
       negAccValues[i] = (negAccValues[i] * n + accel) / (n + 1);
-      chprintf((BaseSequentialStream*) &SD1, "%c%d:%d ", accel < 0 ? '-' : '+',
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%c%d:%d ", accel < 0 ? '-' : '+',
                 accel < 0 ? -accel : accel, negAccValues[i]);
     }
-    chprintf((BaseSequentialStream*) &SD1, "\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
   }
 
   // 2. Apply positive offset
@@ -286,7 +289,7 @@ printSelfTest(LIS331DLHConfig* config) {
   this->configure(&test_accel_run_cfg);
   BaseThread::sleep(MS2ST(sleepBetweenMeasurementMs));
   // Grep some values and build the mean value
-  chprintf((BaseSequentialStream*) &SD1, "\nACC: Get acc pos values\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\nACC: Get acc pos values\n");
   int16_t posAccValues[3] = { this->getAcceleration(LIS331DLH::AXIS_X), this
       ->getAcceleration(LIS331DLH::AXIS_Y), this->getAcceleration(
       LIS331DLH::AXIS_Z) };
@@ -296,10 +299,10 @@ printSelfTest(LIS331DLHConfig* config) {
     for (uint8_t i = LIS331DLH::AXIS_X; i <= LIS331DLH::AXIS_Z; i++) {
       accel = int32_t(this->getAcceleration(i));
       posAccValues[i] = (posAccValues[i] * n + accel) / (n + 1);
-      chprintf((BaseSequentialStream*) &SD1, "%c%d:%d ", accel < 0 ? '-' : '+',
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "%c%d:%d ", accel < 0 ? '-' : '+',
                 accel < 0 ? -accel : accel, posAccValues[i]);
     }
-    chprintf((BaseSequentialStream*) &SD1, "\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
   }
 
   // Get the amplitude change and compare it to the standard values from LIS331DLH manual table 3
@@ -308,31 +311,31 @@ printSelfTest(LIS331DLHConfig* config) {
   const int32_t ampXmin = 120, ampYmin = 120, ampZmin = 140;
 
   // TEST
-  chprintf((BaseSequentialStream*) &SD1, "\n\nACC: Testresult\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\n\nACC: Testresult\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_X] - negAccValues[LIS331DLH::AXIS_X]);
   if (amp < ampXmin || amp > ampXmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Negative x-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Negative x-axis faulty\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_Y] - negAccValues[LIS331DLH::AXIS_Y]);
   if (amp < ampYmin || amp > ampYmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Negative y-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Negative y-axis faulty\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_Z] - negAccValues[LIS331DLH::AXIS_Z]);
   if (amp < ampZmin || amp > ampZmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Negative z-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Negative z-axis faulty\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_X] - posAccValues[LIS331DLH::AXIS_X]);
   if (amp < ampXmin || amp > ampXmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Positive x-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Positive x-axis faulty\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_Y] - posAccValues[LIS331DLH::AXIS_Y]);
   if (amp < ampYmin || amp > ampYmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Positive y-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Positive y-axis faulty\n");
   amp = std::abs(
       stdAccValues[LIS331DLH::AXIS_Z] - posAccValues[LIS331DLH::AXIS_Z]);
   if (amp < ampZmin || amp > ampZmax)
-    chprintf((BaseSequentialStream*) &SD1, "ACC: Positive z-axis faulty\n");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "ACC: Positive z-axis faulty\n");
 
   // Write back the original config
   this->configure(config);

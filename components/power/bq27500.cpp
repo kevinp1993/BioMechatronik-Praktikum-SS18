@@ -2,12 +2,15 @@
 
 #include <ch.hpp>
 #include <chprintf.h>
+#include <global.hpp>
 
 #include <cstring>
 
 using namespace chibios_rt;
 using namespace amiro;
 using namespace BQ27500;
+
+extern Global global;
 
 Driver::Driver(I2CDriver &i2c_driver, const GPIO_TypeDef &batgd_pingrp, const uint8_t batgd_pin, const GPIO_TypeDef &batlow_pingrp, const uint8_t batlow_pin) :
   BaseSensor<BQ27500::InitData,BQ27500::CalibData>(), i2c_driver(&i2c_driver), tx_params({I2C_ADDR, NULL, 0, NULL, 0}),
@@ -26,7 +29,7 @@ Driver::getEventSource()
 msg_t
 Driver::init(InitData* initialization_data)
 {
-  chprintf((BaseSequentialStream*) &SD1, "%s(%d): TODO\n", __FILE__, __LINE__);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): TODO\n", __FILE__, __LINE__);
   return NOT_IMPLEMENTED;
 }
 
@@ -64,14 +67,14 @@ Driver::calibration(CalibData* calibration_data)
   DataFlashBlock block;
   this->readDataFlashBlock(block, CONFIGURATION_Safety);
 
-  chprintf((BaseSequentialStream*) &SD1, "%s(%d):\n", __FILE__, __LINE__);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d):\n", __FILE__, __LINE__);
   for(uint8_t i = 0; i < 32; ++i) {
-    chprintf((BaseSequentialStream*) &SD1, "%02X ", block.content.data[i]);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%02X ", block.content.data[i]);
   }
-  chprintf((BaseSequentialStream*) &SD1, "\n");
-  chprintf((BaseSequentialStream*) &SD1, "%02X\n", block.content.checksum);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "%02X\n", block.content.checksum);
 
-  chprintf((BaseSequentialStream*) &SD1, "%s(%d): TODO\n", __FILE__, __LINE__);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): TODO\n", __FILE__, __LINE__);
   return NOT_IMPLEMENTED;
 }
 #endif
@@ -89,7 +92,7 @@ Driver::selftest()
   {
     return ST_FAIL_READ_HW_VERSION;
   }
-  chprintf((BaseSequentialStream*) &SD1, "hardware version: %X%X-%X%X (0x%04X)\n", version.content.major_high, version.content.major_low, version.content.minor_high, version.content.minor_low, version.value);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "hardware version: %X%X-%X%X (0x%04X)\n", version.content.major_high, version.content.major_low, version.content.minor_high, version.content.minor_low, version.value);
 
   // read firmware version
   version.value = 0;
@@ -97,7 +100,7 @@ Driver::selftest()
   {
     return ST_FAIL_READ_FW_VERSION;
   }
-  chprintf((BaseSequentialStream*) &SD1, "firmware version: %X%X-%X%X (0x%04X)\n", version.content.major_high, version.content.major_low, version.content.minor_high, version.content.minor_low, version.value);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "firmware version: %X%X-%X%X (0x%04X)\n", version.content.major_high, version.content.major_low, version.content.minor_high, version.content.minor_low, version.value);
 
   // read device name
   uint8_t name_length = 0;
@@ -111,7 +114,7 @@ Driver::selftest()
     return ST_FAIL_READ_DEVICENAME;
   }
   name_buffer[name_length] = '\0';
-  chprintf((BaseSequentialStream*) &SD1, "device name: %s (%u characters)\n", name_buffer, name_length);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "device name: %s (%u characters)\n", name_buffer, name_length);
 
   // read the current flags
   Flags flags;
@@ -119,19 +122,19 @@ Driver::selftest()
   {
     return ST_FAIL_READ_FLAGS;
   }
-  chprintf((BaseSequentialStream*) &SD1, "flags: 0x%04X\n", flags.value);
-  chprintf((BaseSequentialStream*) &SD1, "  OTC     : %u\n", flags.content.otc);
-  chprintf((BaseSequentialStream*) &SD1, "  OTD     : %u\n", flags.content.otd);
-  chprintf((BaseSequentialStream*) &SD1, "  CHG_INH : %u\n", flags.content.chg_inh);
-  chprintf((BaseSequentialStream*) &SD1, "  XCHG    : %u\n", flags.content.xchg);
-  chprintf((BaseSequentialStream*) &SD1, "  FC      : %u\n", flags.content.fc);
-  chprintf((BaseSequentialStream*) &SD1, "  CHG     : %u\n", flags.content.chg);
-  chprintf((BaseSequentialStream*) &SD1, "  OCV_GD  : %u\n", flags.content.ocv_gd);
-  chprintf((BaseSequentialStream*) &SD1, "  WAIT_ID : %u\n", flags.content.wait_id);
-  chprintf((BaseSequentialStream*) &SD1, "  BAT_DET : %u\n", flags.content.bat_det);
-  chprintf((BaseSequentialStream*) &SD1, "  SOC1    : %u\n", flags.content.soc1);
-  chprintf((BaseSequentialStream*) &SD1, "  SOCF    : %u\n", flags.content.socf);
-  chprintf((BaseSequentialStream*) &SD1, "  DSG     : %u\n", flags.content.dsg);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "flags: 0x%04X\n", flags.value);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  OTC     : %u\n", flags.content.otc);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  OTD     : %u\n", flags.content.otd);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  CHG_INH : %u\n", flags.content.chg_inh);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  XCHG    : %u\n", flags.content.xchg);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  FC      : %u\n", flags.content.fc);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  CHG     : %u\n", flags.content.chg);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  OCV_GD  : %u\n", flags.content.ocv_gd);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  WAIT_ID : %u\n", flags.content.wait_id);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  BAT_DET : %u\n", flags.content.bat_det);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  SOC1    : %u\n", flags.content.soc1);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  SOCF    : %u\n", flags.content.socf);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  DSG     : %u\n", flags.content.dsg);
 
   // read the current controller status
   ControlStatus ctrl_status;
@@ -139,19 +142,19 @@ Driver::selftest()
   {
     return ST_FAIL_READ_STATUS;
   }
-  chprintf((BaseSequentialStream*) &SD1, "control status: 0x%04X\n", ctrl_status.value);
-  chprintf((BaseSequentialStream*) &SD1, "  FAS       : %u\n", ctrl_status.content.fas);
-  chprintf((BaseSequentialStream*) &SD1, "  SS        : %u\n", ctrl_status.content.ss);
-  chprintf((BaseSequentialStream*) &SD1, "  CSV       : %u\n", ctrl_status.content.csv);
-  chprintf((BaseSequentialStream*) &SD1, "  CSA       : %u\n", ctrl_status.content.cca);
-  chprintf((BaseSequentialStream*) &SD1, "  BCA       : %u\n", ctrl_status.content.bca);
-  chprintf((BaseSequentialStream*) &SD1, "  HIBERNATE : %u\n", ctrl_status.content.hibernate);
-  chprintf((BaseSequentialStream*) &SD1, "  SNOOZE    : %u\n", ctrl_status.content.snooze);
-  chprintf((BaseSequentialStream*) &SD1, "  SLEEP     : %u\n", ctrl_status.content.sleep);
-  chprintf((BaseSequentialStream*) &SD1, "  LDMD      : %u\n", ctrl_status.content.ldmd);
-  chprintf((BaseSequentialStream*) &SD1, "  RUP_DIS   : %u\n", ctrl_status.content.rup_dis);
-  chprintf((BaseSequentialStream*) &SD1, "  VOK       : %u\n", ctrl_status.content.vok);
-  chprintf((BaseSequentialStream*) &SD1, "  QEN       : %u\n", ctrl_status.content.qen);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "control status: 0x%04X\n", ctrl_status.value);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  FAS       : %u\n", ctrl_status.content.fas);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  SS        : %u\n", ctrl_status.content.ss);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  CSV       : %u\n", ctrl_status.content.csv);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  CSA       : %u\n", ctrl_status.content.cca);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  BCA       : %u\n", ctrl_status.content.bca);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  HIBERNATE : %u\n", ctrl_status.content.hibernate);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  SNOOZE    : %u\n", ctrl_status.content.snooze);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  SLEEP     : %u\n", ctrl_status.content.sleep);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  LDMD      : %u\n", ctrl_status.content.ldmd);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  RUP_DIS   : %u\n", ctrl_status.content.rup_dis);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  VOK       : %u\n", ctrl_status.content.vok);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "  QEN       : %u\n", ctrl_status.content.qen);
 
   // if no battery was detected, abort
   if (!flags.content.bat_det)
@@ -160,92 +163,92 @@ Driver::selftest()
   }
 
   // read the BATGD_N pin
-  chprintf((BaseSequentialStream*) &SD1, "battery good: %s\n", (this->isBatteryGood()? "yes" : "no"));
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "battery good: %s\n", (this->isBatteryGood()? "yes" : "no"));
 
   // read temperature
   if (this->stdCommand(STD_CMD_TEMP, val))
   {
     return ST_FAIL_READ_TEMP;
   }
-  chprintf((BaseSequentialStream*) &SD1, "temperature: %fK (%fC)\n", float(val)/10.0f, float(val)/10.0f - 273.15f);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "temperature: %fK (%fC)\n", float(val)/10.0f, float(val)/10.0f - 273.15f);
 
   // read the full available capacity
   if (this->stdCommand(STD_CMD_FAC, val))
   {
     return ST_FAIL_READ_FAC;
   }
-  chprintf((BaseSequentialStream*) &SD1, "full available capacity: %umAh\n", val);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "full available capacity: %umAh\n", val);
 
   // read the full charge capacity
   if (this->stdCommand(STD_CMD_FCC, val))
   {
     return ST_FAIL_READ_FCC;
   }
-  chprintf((BaseSequentialStream*) &SD1, "full charge capacity: %umAh\n", val);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "full charge capacity: %umAh\n", val);
 
   // read the remaining capacity
   if (this->stdCommand(STD_CMD_RM, val))
   {
     return ST_FAIL_READ_RM;
   }
-  chprintf((BaseSequentialStream*) &SD1, "remaining capacity capacity: %umAh\n", val);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "remaining capacity capacity: %umAh\n", val);
 
   // read the state of charge
   if (this->stdCommand(STD_CMD_SOC, val))
   {
     return ST_FAIL_READ_SOC;
   }
-  chprintf((BaseSequentialStream*) &SD1, "state of charge: %3u%%\n", val);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "state of charge: %3u%%\n", val);
 
   // read voltage
   if (this->stdCommand(STD_CMD_VOLT, val))
   {
     return ST_FAIL_READ_VOLT;
   }
-  chprintf((BaseSequentialStream*) &SD1, "voltage: %umV\n", val);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "voltage: %umV\n", val);
 
   // read average current
   if (this->stdCommand(STD_CMD_AI, val))
   {
     return ST_FAIL_READ_AI;
   }
-  chprintf((BaseSequentialStream*) &SD1, "average current: %dmA\n", *reinterpret_cast<int8_t*>(&val));
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "average current: %dmA\n", *reinterpret_cast<int8_t*>(&val));
 
   // read average power
   if (this->stdCommand(STD_CMD_AP, val))
   {
     return ST_FAIL_READ_AP;
   }
-  chprintf((BaseSequentialStream*) &SD1, "average power: %dmW\n", *reinterpret_cast<int8_t*>(&val));
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "average power: %dmW\n", *reinterpret_cast<int8_t*>(&val));
 
   // read the BATLOW pin
-  chprintf((BaseSequentialStream*) &SD1, "battery low: %s\n", (this->isBatteryLow()? "yes" : "no"));
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "battery low: %s\n", (this->isBatteryLow()? "yes" : "no"));
 
   // read the time to empty
   if (this->stdCommand(STD_CMD_TTE, val))
   {
     return ST_FAIL_READ_TTE;
   }
-  chprintf((BaseSequentialStream*) &SD1, "time to empty: ");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "time to empty: ");
   if (uint16_t(~val)) {
-    chprintf((BaseSequentialStream*) &SD1, "%u minutes", val);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%u minutes", val);
   } else {
-    chprintf((BaseSequentialStream*) &SD1, "(not discharging)");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "(not discharging)");
   }
-  chprintf((BaseSequentialStream*) &SD1, "\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
 
   // read the time to full
   if (this->stdCommand(STD_CMD_TTF, val))
   {
     return ST_FAIL_READ_TTF;
   }
-  chprintf((BaseSequentialStream*) &SD1, "time to full: ");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "time to full: ");
   if (uint16_t(~val)) {
-    chprintf((BaseSequentialStream*) &SD1, "%u minutes", val);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%u minutes", val);
   } else {
-    chprintf((BaseSequentialStream*) &SD1, "(not charging)");
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "(not charging)");
   }
-  chprintf((BaseSequentialStream*) &SD1, "\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "\n");
 
   return ST_OK;
 }
@@ -300,7 +303,7 @@ Driver::stdCommand(const StandardCommand cmd, uint16_t &dst)
     dst = uint16_t((buffer[1] << 8) | buffer[0]);
 #ifndef NDEBUG
   } else {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
 #endif
   }
 
@@ -323,7 +326,7 @@ Driver::readName()
 
   buffer[buffer[0] + 1] = '\0';
 
-  chprintf((BaseSequentialStream*) &SD1, "name: %u - %s\n", buffer[0], (char*)&buffer[1]);
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "name: %u - %s\n", buffer[0], (char*)&buffer[1]);
 
   return res;
 }
@@ -353,7 +356,7 @@ Driver::subCommand(const ControlSubcommand cmd, uint16_t *dst)
 
 #ifndef NDEBUG
   if (res) {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
   }
 #endif
 
@@ -369,19 +372,19 @@ Driver::extCommand(const ExtendedCommand cmd, const ExtendedCommandAccess rw, ui
 {
   if (!buf) {
 #ifndef NDEBUG
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: received NULL-pointer as buffer\n", __FILE__ , __LINE__);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: received NULL-pointer as buffer\n", __FILE__ , __LINE__);
 #endif
     return ~RDY_OK;
   }
   if (rw != EXT_CMD_WRITE && rw != EXT_CMD_READ) {
 #ifndef NDEBUG
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: invalid access mode selected\n", __FILE__ , __LINE__);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: invalid access mode selected\n", __FILE__ , __LINE__);
 #endif
     return ~RDY_OK;
   }
   if (length > 33) {
 #ifndef NDEBUG
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: length exceeds maximum of 33 bytes\n", __FILE__ , __LINE__);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: length exceeds maximum of 33 bytes\n", __FILE__ , __LINE__);
 #endif
     return ~RDY_OK;
   }
@@ -402,7 +405,7 @@ Driver::extCommand(const ExtendedCommand cmd, const ExtendedCommandAccess rw, ui
 
 #ifndef NDEBUG
   if (res) {
-    chprintf((BaseSequentialStream*) &SD1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
+    chprintf((BaseSequentialStream*) &global.sercanmux1, "%s(%d): ERROR: i2c transmit failed (%d)\n", __FILE__ , __LINE__ , res);
   }
 #endif
 

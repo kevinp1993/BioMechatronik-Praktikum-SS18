@@ -7,8 +7,11 @@
 #include <amiro/bus/spi/HWSPIDriver.hpp>
 #include <amiro/gyro/l3g4200d.hpp>
 #include <amiro/Constants.h>
+#include <global.hpp>
 
 using namespace chibios_rt;
+
+extern Global global;
 
 namespace amiro {
 
@@ -34,7 +37,7 @@ msg_t L3G4200D::main() {
   this->setName("l3g4200d");
 
   while (!this->shouldTerminate()) {
-	time += this->period_st;
+  time += this->period_st;
 
     updateSensorData();
     calcAngular();
@@ -44,8 +47,8 @@ msg_t L3G4200D::main() {
     if (time >= System::getTime()) {
       chThdSleepUntil(time);
     } else {
-      chprintf((BaseSequentialStream*) &SD1, "WARNING l3g4200d: Unable to keep track\r\n");
-	}
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "WARNING l3g4200d: Unable to keep track\r\n");
+  }
   }
   return RDY_OK;
 }
@@ -168,7 +171,7 @@ msg_t L3G4200D::configure(const L3G4200DConfig *config) {
 
   // Reset the integration
   this->angularReset();
-    
+
   return RDY_OK;
 
 }

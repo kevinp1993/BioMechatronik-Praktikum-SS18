@@ -5,11 +5,15 @@
 
 #include <amiro/DistControl.h>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
 using namespace types;
 using namespace constants;
 using namespace constants::DiWheelDrive;
+
+extern Global global;
 
 DistControl::DistControl(MotorControl* mc, MotorIncrements* mi)
     : BaseStaticThread<256>(),
@@ -142,7 +146,7 @@ msg_t DistControl::main(void) {
 
 /*
       if (time-printTime > MS2ST(100)) {
-        chprintf((BaseSequentialStream*) &SD1, "dist = %i um, angle = %i urad, ed = %i um, ea = %i, v = %i um/s, w = %i urad/s\n", realDistance, realAngle, errorDistance, errorAngle, targetVelocity.x, targetVelocity.w_z);
+        chprintf((BaseSequentialStream*) &global.sercanmux1, "dist = %i um, angle = %i urad, ed = %i um, ea = %i, v = %i um/s, w = %i urad/s\n", realDistance, realAngle, errorDistance, errorAngle, targetVelocity.x, targetVelocity.w_z);
         printTime = time;
       }
 */

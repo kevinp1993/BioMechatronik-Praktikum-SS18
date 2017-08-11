@@ -6,8 +6,12 @@
 #include <amiro/bluetooth/bluetooth-iwrap.hpp>
 #include <amiro/bluetooth/bluetooth-connector.hpp>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
+
+extern Global global;
 
 /*
  * Class constructor
@@ -52,7 +56,7 @@ msg_t BluetoothIwrap::iwrapReceive() {
 
   for (size_t i = 0; i < length; i++) {
     // print out received chars
-    chSequentialStreamPut((BaseSequentialStream*) &SD1, buffer[i]);
+    chSequentialStreamPut((BaseSequentialStream*) &global.sercanmux1, buffer[i]);
   }
 
   // reset block
@@ -135,7 +139,7 @@ void BluetoothIwrap::bluetoothIwrapSendCommand(const char* cmd) {
 
   size_t length = strlen(cmd);
 //  for (size_t i = 0; i < length; i++)
-//    chSequentialStreamPut((BaseSequentialStream*) &SD1, cmd[i]);   // To display the command
+//    chSequentialStreamPut((BaseSequentialStream*) &global.sercanmux1, cmd[i]);   // To display the command
 
   // To send the string command to WT12 bluetooth chip
   iwrapTransmit(HOST_IWRAP_PLAIN_LINKID,(uint8_t*) cmd, length);

@@ -1,7 +1,11 @@
 #include <amiro/Lidar.h>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
+
+extern Global global;
 
 uint8_t Lidar::scannedData[NUMBER_OF_CHARACTERS + 1] = {};
 
@@ -49,18 +53,18 @@ msg_t Lidar::main(void) {
         flushSD2InputQueue();
 
         // Configure LIDAR serial interface speed
-//       chprintf((BaseSequentialStream*) &SD1, "Speed switch to " STR(SD_SPEED) "\n");
+//       chprintf((BaseSequentialStream*) &global.sercanmux1, "Speed switch to " STR(SD_SPEED) "\n");
         chprintf((BaseSequentialStream*) &SD2, "SS" STR(SD_SPEED_PREFIX) STR(SD_SPEED) LF);
 
         // Check if the switch went well, otherwise terminate the thread
         if (checkDataString("SS" STR(SD_SPEED_PREFIX) STR(SD_SPEED) "\n00P\n\n")) {
-          chprintf((BaseSequentialStream*) &SD1, "Lidar speed switch OK\n");
+          chprintf((BaseSequentialStream*) &global.sercanmux1, "Lidar speed switch OK\n");
           // Configure serial interface of STM32
           sdStop(&SD2);
           SerialConfig sdLidarconf = { SD_SPEED, 0, 0, 0 };
           sdStart(&SD2, &sdLidarconf);
         } else {
-          chprintf((BaseSequentialStream*) &SD1, "Lidar speed switch NOT OK: Terminating Lidar \n");
+          chprintf((BaseSequentialStream*) &global.sercanmux1, "Lidar speed switch NOT OK: Terminating Lidar \n");
           palWritePad(GPIOB, GPIOB_LASER_EN, PAL_LOW);
           return -1;
         }
@@ -200,7 +204,7 @@ msg_t Lidar::updateSensorVal() {
             --this->dataIdx;
             this->lastInput = this->newInput;
           }
-          //chprintf((BaseSequentialStream*) &SD1, "%d ", this->newInput);
+          //chprintf((BaseSequentialStream*) &global.sercanmux1, "%d ", this->newInput);
         } else {
           step = FAIL;
         }
@@ -216,9 +220,9 @@ msg_t Lidar::updateSensorVal() {
         break;
       case DATA_SHOW:
         // Show the decoded data
-        chprintf((BaseSequentialStream*) &SD1, "\n%d", this->dataCounter);
+        chprintf((BaseSequentialStream*) &global.sercanmux1, "\n%d", this->dataCounter);
         for (uint32_t idx=0; idx < this->dataIdx; idx+=2) {
-          chprintf((BaseSequentialStream*) &SD1, "\n%d", *((uint16_t*) &(Lidar::scannedData[idx])));
+          chprintf((BaseSequentialStream*) &global.sercanmux1, "\n%d", *((uint16_t*) &(Lidar::scannedData[idx])));
         }
         step = FINISH;
         break;
@@ -252,11 +256,11 @@ void Lidar::printData() {
       if (lastInput == 10 && newInput == 10) {
         return;
       } else {
-        chprintf((BaseSequentialStream*) &SD1, "%c", newInput);
+        chprintf((BaseSequentialStream*) &global.sercanmux1, "%c", newInput);
       }
       lastInput = newInput;
     } else {
-      chprintf((BaseSequentialStream*) &SD1, "TIMEOUT\n", newInput);
+      chprintf((BaseSequentialStream*) &global.sercanmux1, "TIMEOUT\n", newInput);
       return;
     }
   }
@@ -291,7 +295,7 @@ bool_t Lidar::checkDataString(const char compareString[]) {
 
 void Lidar::printDetails() {
 
-  chprintf((BaseSequentialStream*) &SD1, "Print sensor details:\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "Print sensor details:\n");
 
   // Tell the sensor to transmit its details
   chprintf((BaseSequentialStream*) &SD2, "VV\n");
@@ -302,7 +306,7 @@ void Lidar::printDetails() {
 
 void Lidar::printSpecification() {
 
-  chprintf((BaseSequentialStream*) &SD1, "Print sensor specification:\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "Print sensor specification:\n");
 
   // Tell the sensor to transmit its specifications
   chprintf((BaseSequentialStream*) &SD2, "PP\n");
@@ -312,7 +316,7 @@ void Lidar::printSpecification() {
 }
 
 void Lidar::printInformation() {
-  chprintf((BaseSequentialStream*) &SD1, "Print sensor information:\n");
+  chprintf((BaseSequentialStream*) &global.sercanmux1, "Print sensor information:\n");
 
   // Tell the sensor to transmit its information
   chprintf((BaseSequentialStream*) &SD2, "II\n");

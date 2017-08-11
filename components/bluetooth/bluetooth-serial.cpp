@@ -3,8 +3,12 @@
 
 #include <amiro/bluetooth/bluetooth-serial.hpp>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
+
+extern Global global;
 
 /*
  * Class constructor
@@ -47,7 +51,7 @@ msg_t BluetoothSerial::serialReceive() {
   length = recv_descriptor->bluetoothDescriptorGetPayloadLength();
 
   for (size_t i = 0; i < length; i++)
-    chSequentialStreamPut((BaseSequentialStream*) &SD1, buffer[i]);
+    chSequentialStreamPut((BaseSequentialStream*) &global.sercanmux1, buffer[i]);
 
   msg = iwrap->transport.bluetoothTransportGetStorageMailbox()->post((msg_t) recv_descriptor, TIME_INFINITE);
   if ((msg == RDY_RESET) || stopflag)
