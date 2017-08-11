@@ -858,6 +858,36 @@ void shellRequestGetBootloaderInfo(BaseSequentialStream* chp, int argc, char *ar
   return;
 }
 
+void shellRequestWiiSteering(BaseSequentialStream* chp, int argc, char *argv[]) {
+  // if Wii steering is currently active, stop it
+  if (global.userThread.getCurrenState() == UserThread::WII_STEERING) {
+    global.userThread.setNextState(UserThread::IDLE);
+  }
+  // check arguments and (try to) enable Wii steering
+  else {
+    // if arguments invalid
+    if (argc < 1 || argc > 2 || global.userThread.setWiiAddress(argv[0]) != RDY_OK) {
+      chprintf(chp, "Warning: invalid arguments\n");
+      chprintf(chp, "Usage: %s\n", "wii_steering <address> [<deadzone>]");
+      chprintf(chp, "\n");
+      chprintf(chp, "\taddress\n");
+      chprintf(chp, "bluetooth address of the Wiimote controller to pair with.\n");
+      chprintf(chp, "\tdeadzone\n");
+      chprintf(chp, "deadzone to set for the Wiimote controller [default = 10%%].\n");
+      return;
+    }
+    else {
+      // set deadzone
+      const float deadzone = global.userThread.setWiiDeadzone((argc == 2) ? std::atof(argv[1]) : 0.1f);
+      chprintf(chp, "deadzone set to %u%%\n", (unsigned int)(deadzone * 100.0f));
+
+      // start Wii steering behaviour
+      global.userThread.setNextState(UserThread::WII_STEERING);
+    }
+  }
+  return;
+}
+
 static const ShellCommand commands[] = {
   {"shutdown", shellRequestShutdown},
   {"check", shellRequestCheck},
@@ -876,6 +906,7 @@ static const ShellCommand commands[] = {
   {"print_vcnl", shellRequestPrintVCNL},
   {"shell_board", shellSwitchBoardCmd},
   {"get_bootloader_info", shellRequestGetBootloaderInfo},
+  {"wii_steering", shellRequestWiiSteering},
   {NULL, NULL}
 };
 

@@ -33,6 +33,21 @@ namespace amiro {
     };
     Accelerometer *getAccelerometer();
 
+    struct Buttons {
+      uint16_t left : 1;
+      uint16_t right : 1;
+      uint16_t down : 1;
+      uint16_t up : 1;
+      uint16_t plus : 1;
+      uint16_t two : 1;
+      uint16_t one : 1;
+      uint16_t B : 1;
+      uint16_t A : 1;
+      uint16_t minus : 1;
+      uint16_t home : 1;
+    };
+    Buttons* getButtons();
+
   protected:
     virtual msg_t main(void);
 
@@ -50,6 +65,7 @@ namespace amiro {
     uint8_t stopflag;
 
     Accelerometer accelerometer;
+    Buttons buttons;
   };
 }
 

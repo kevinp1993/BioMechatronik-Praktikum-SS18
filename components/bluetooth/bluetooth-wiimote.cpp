@@ -3,8 +3,12 @@
 
 #include <amiro/bluetooth/bluetooth-wiimote.hpp>
 
+#include <global.hpp>
+
 using namespace chibios_rt;
 using namespace amiro;
+
+extern Global global;
 
 /*
  * Class constructor
@@ -39,18 +43,6 @@ msg_t BluetoothWiimote::wiimoteReceive() {
   size_t length;
   msg_t msg;
 
-  static uint8_t button_up;
-  static uint8_t button_down;
-  static uint8_t button_right;
-  static uint8_t button_left;
-  static uint8_t button_plus;
-  static uint8_t button_home;
-  static uint8_t button_minus;
-  static uint8_t button_A;
-  static uint8_t button_B;
-  static uint8_t button_1;
-  static uint8_t button_2;
-
   msg = mailbox.fetch((msg_t*) &recv_descriptor, TIME_INFINITE);
   if ((msg == RDY_RESET) || stopflag)
     return RDY_RESET;
@@ -58,68 +50,26 @@ msg_t BluetoothWiimote::wiimoteReceive() {
   buffer = recv_descriptor->bluetoothDescriptorGetPayload();
   length = recv_descriptor->bluetoothDescriptorGetPayloadLength();
 
-  if (buffer[0] == 0xA1 && buffer[1] == 0x31) {
-    accelerometer.x_axis = (buffer[4] << 2) + ((buffer[2] & 0x60) >> 5) - 0x1EC;
-    accelerometer.y_axis = (buffer[5] << 2) + ((buffer[3] & 0x20) >> 4) - 0x1EA;
-    accelerometer.z_axis = (buffer[6] << 2) + ((buffer[3] & 0x40) >> 5) - 0x1EE;
+  if (buffer[0] == 0xA1 && (buffer[1] == 0x30 || buffer[1] == 0x31)) {
+      buttons.left  = (buffer[2] & 0x01) ? 1 : 0;
+      buttons.right = (buffer[2] & 0x02) ? 1 : 0;
+      buttons.down  = (buffer[2] & 0x04) ? 1 : 0;
+      buttons.up    = (buffer[2] & 0x08) ? 1 : 0;
+      buttons.plus  = (buffer[2] & 0x10) ? 1 : 0;
+      buttons.two   = (buffer[3] & 0x01) ? 1 : 0;
+      buttons.one   = (buffer[3] & 0x02) ? 1 : 0;
+      buttons.B     = (buffer[3] & 0x04) ? 1 : 0;
+      buttons.A     = (buffer[3] & 0x08) ? 1 : 0;
+      buttons.minus = (buffer[3] & 0x10) ? 1 : 0;
+      buttons.home  = (buffer[3] & 0x80) ? 1 : 0;
 
-    if (buffer[3] & 0x80) {             // Press home to return button reporting
-      bluetoothWiimoteDataBtn();
-      accelerometer.x_axis = 0;
-      accelerometer.y_axis = 0;
-      accelerometer.z_axis = 0;
-    }
+      accelerometer.x_axis = (buffer[4] << 2) + ((buffer[2] & 0x60) >> 5) - 0x1FF;
+      accelerometer.y_axis = (buffer[5] << 2) + ((buffer[3] & 0x20) >> 4) - 0x1FF;
+      accelerometer.z_axis = (buffer[6] << 2) + ((buffer[3] & 0x40) >> 5) - 0x1FF;
 
-  } else if (buffer[0] == 0xA1 && buffer[1] == 0x30) {
-    button_up    = (buffer[2] & 0x08) >> 3;
-    button_down  = (buffer[2] & 0x04) >> 2;
-    button_right = (buffer[2] & 0x02) >> 1;
-    button_left  = (buffer[2] & 0x01) >> 0;
-    button_plus  = (buffer[2] & 0x10) >> 4;
-    button_home  = (buffer[3] & 0x80) >> 7;
-    button_minus = (buffer[3] & 0x10) >> 4;
-    button_A     = (buffer[3] & 0x08) >> 3;
-    button_B     = (buffer[3] & 0x04) >> 2;
-    button_1     = (buffer[3] & 0x02) >> 1;
-    button_2     = (buffer[3] & 0x01) >> 0;
-
-    if (button_up)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'U');
-
-    if (button_down)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'D');
-
-    if (button_right)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'R');
-
-    if (button_left)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'L');
-
-    if (button_plus)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, '+');
-
-    if (button_home)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'H');
-
-    if (button_minus)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, '-');
-
-    if (button_A)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'A');
-
-    if (button_B)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, 'B');
-
-    if (button_1)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, '1');
-
-    if (button_2)
-      chSequentialStreamPut((BaseSequentialStream*) &SD1, '2');
-
-    if (button_minus && button_plus)   // Press minus and plue to return accelerometer reporting
       bluetoothWiimoteDataBtnAcc();
   } else {
-    chSequentialStreamWrite((BaseSequentialStream*) &SD1, buffer, length);
+    chSequentialStreamWrite((BaseSequentialStream*) &global.sercanmux1, buffer, length);
   }
 
   msg = iwrap->transport.bluetoothTransportGetStorageMailbox()->post((msg_t) recv_descriptor, TIME_INFINITE);
@@ -177,6 +127,10 @@ void BluetoothWiimote::bluetoothWiimoteDisconnect(const char *addr) {
 
 BluetoothWiimote::Accelerometer * BluetoothWiimote::getAccelerometer() {
   return &accelerometer;
+}
+
+BluetoothWiimote::Buttons * BluetoothWiimote::getButtons() {
+  return &buttons;
 }
 
 /*

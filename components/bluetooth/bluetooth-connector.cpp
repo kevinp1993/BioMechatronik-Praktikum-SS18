@@ -63,7 +63,7 @@ void BluetoothConnector::bluetoothConnectorConnect(const char *addr) {
         break;
       }
       iwrap->bluetoothIwrapSendCommand(cmd);
-      BaseThread::sleep(MS2ST(5000));    // waiting connection establish
+      BaseThread::sleep(MS2ST(1000));    // waiting connection establish
       break;
     }
   }
