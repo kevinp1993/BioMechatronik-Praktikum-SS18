@@ -411,7 +411,7 @@ UserThread::main()
             setRpmSpeed(rpmFuzzyCtrl);
         }
 
-		this->sleep(MS2ST(10));
+		this->sleep(CAN::UPDATE_PERIOD);
 	}
 
   return RDY_OK;

@@ -37,7 +37,7 @@ namespace amiro {
 
 namespace CAN {
 
-  const uint32_t UPDATE_PERIOD_MSEC        = US2ST(62500);  // 16 Hz
+  const uint32_t UPDATE_PERIOD        = US2ST(62500);  // 16 Hz
 
   const uint32_t PERIODIC_TIMER_ID         = 1;
   const uint32_t RECEIVED_ID               = 2;

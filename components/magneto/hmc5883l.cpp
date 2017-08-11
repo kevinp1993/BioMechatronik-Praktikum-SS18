@@ -51,7 +51,7 @@ main(void) {
 
     this->eventSource.broadcastFlags(0);
 
-    this->waitAnyEventTimeout(ALL_EVENTS, CAN::UPDATE_PERIOD_MSEC);
+    this->waitAnyEventTimeout(ALL_EVENTS, CAN::UPDATE_PERIOD);
   }
 
   return RDY_OK;

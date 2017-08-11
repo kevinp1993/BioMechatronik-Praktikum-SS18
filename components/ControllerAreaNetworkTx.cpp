@@ -163,7 +163,7 @@ void ControllerAreaNetworkTx::txReplyShell(uint8_t toBoardId, char *textdata, ui
 //----------------------------------------------------------------
 
 msg_t ControllerAreaNetworkTx::main(void) {
-  evtInit(&this->evtimer, CAN::UPDATE_PERIOD_MSEC);
+  evtInit(&this->evtimer, CAN::UPDATE_PERIOD);
 
   this->eventTimerEvtSource = reinterpret_cast<EvtSource *>(&this->evtimer.et_es);
 
