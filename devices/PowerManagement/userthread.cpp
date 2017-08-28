@@ -66,6 +66,8 @@ BluetoothSerial btserial(&global.wt12, RX_TX);
 float deadzone;
 char bt_address[18] = {'\0'};
 float wiimoteCalib[3] = {0.0f};
+uint8_t principal_axis = 1;
+int8_t axis_direction = -1;
 
 uint32_t constexpr maxTranslation = 500e3;
 uint32_t constexpr maxRotation = 3.1415927f * 1000000.0f * 2.0f;
@@ -283,11 +285,27 @@ UserThread::main()
 
           // calibrate accelerometer offset
           if (wii_steering::wiimote.getButtons()->home) {
-            wii_steering::wiimoteCalib[0] = wiimoteAcc[0];
-            wii_steering::wiimoteCalib[1] = wiimoteAcc[1] + 100.0f;
-            wii_steering::wiimoteCalib[2] = wiimoteAcc[2];
+            chprintf((BaseSequentialStream*)&global.sercanmux1, "%f | %f | %f\n", wiimoteAcc[0], wiimoteAcc[1], wiimoteAcc[2]);
 
+            // detect principal axis
+            if (std::fabs(wiimoteAcc[0]) > std::fabs(wiimoteAcc[1]) && std::fabs(wiimoteAcc[0]) > std::fabs(wiimoteAcc[2])) {
+              wii_steering::principal_axis = 0;
+            } else if (std::fabs(wiimoteAcc[1]) > std::fabs(wiimoteAcc[0]) && std::fabs(wiimoteAcc[1]) > std::fabs(wiimoteAcc[2])) {
+              wii_steering::principal_axis = 1;
+            } else if (std::fabs(wiimoteAcc[2]) > std::fabs(wiimoteAcc[0]) && std::fabs(wiimoteAcc[2]) > std::fabs(wiimoteAcc[1])) {
+              wii_steering::principal_axis = 2;
+            }
+            wii_steering::axis_direction = (wiimoteAcc[wii_steering::principal_axis] >= 0) ? 1 : -1;
+
+            // get calibration offset
+            wii_steering::wiimoteCalib[0] = wiimoteAcc[0];
+            wii_steering::wiimoteCalib[1] = wiimoteAcc[1];
+            wii_steering::wiimoteCalib[2] = wiimoteAcc[2];
+            wii_steering::wiimoteCalib[wii_steering::principal_axis] += -100.0f * wii_steering::axis_direction;
+
+            // print information
             chprintf((BaseSequentialStream*)&global.sercanmux1, "accelerometer calibrated:\n");
+            chprintf((BaseSequentialStream*)&global.sercanmux1, "\tprincipal axis: %c\n", (wii_steering::principal_axis == 0) ? 'X' : (wii_steering::principal_axis == 1) ? 'Y' : 'Z');
             chprintf((BaseSequentialStream*)&global.sercanmux1, "\tX = %d\n", (int32_t)wii_steering::wiimoteCalib[0]);
             chprintf((BaseSequentialStream*)&global.sercanmux1, "\tY = %d\n", (int32_t)wii_steering::wiimoteCalib[1]);
             chprintf((BaseSequentialStream*)&global.sercanmux1, "\tZ = %d\n", (int32_t)wii_steering::wiimoteCalib[2]);
@@ -327,10 +345,25 @@ UserThread::main()
           }
 
           // only move when A is pressed
-          if (wii_steering::wiimote.getButtons()->A) {
+          if (wii_steering::wiimote.getButtons()->A || wii_steering::wiimote.getButtons()->B) {
             // set kinematic relaive to maximum speeds
-            kinematic.x = wii_steering::maxTranslation * wiimoteAcc[2];
-            kinematic.w_z = wii_steering::maxRotation * wiimoteAcc[0] * ((wiimoteAcc[2] < 0.0f) ? 1.0f : -1.0f);
+            switch (wii_steering::principal_axis) {
+              case 1:
+                if (wii_steering::axis_direction == -1) {
+                  kinematic.x = wii_steering::maxTranslation * wiimoteAcc[2];
+                  kinematic.w_z = wii_steering::maxRotation * wiimoteAcc[0] * ((wiimoteAcc[2] < 0.0f) ? 1.0f : -1.0f);
+                  break;
+                }
+              case 2:
+                if (wii_steering::axis_direction == 1) {
+                  kinematic.x = wii_steering::maxTranslation * wiimoteAcc[1];
+                  kinematic.w_z = wii_steering::maxRotation * wiimoteAcc[0] * ((wiimoteAcc[1] < 0.0f) ? 1.0f : -1.0f);
+                  break;
+                }
+              default:
+                kinematic = {0, 0, 0, 0, 0, 0};
+                break;
+            }
           } else {
             kinematic = {0, 0, 0, 0, 0, 0};
           }
