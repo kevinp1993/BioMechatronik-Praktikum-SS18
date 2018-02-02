@@ -19,7 +19,7 @@ extern Global global;
 
 
 Odometry::Odometry(MotorIncrements* mi, L3G4200D* gyroscope)
-    : BaseStaticThread<1024>(),
+    : BaseStaticThread<512>(),
       motorIncrements(mi),
       gyro(gyroscope),
       eventSource(),
@@ -82,15 +82,11 @@ void Odometry::resetPosition() {
 
 void Odometry::setError(float* Cp3x3) {
   chSysLock();
-//   float** test;
     Matrix::copy<float>(Cp3x3,3,3, &(this->Cp3x3[0]),3,3);
-//     Matrix::copy<float>(Cp3x3,3,3, test,3,3);
   chSysUnlock();
 }
 
 void Odometry::resetError() {
-//   float zeroMatrix[9] = {};
-//   this->setError(&(zeroMatrix[0]));
   Matrix::init<float>(&(this->Cp3x3[0]),3,3,0.0f);
 }
 
@@ -105,7 +101,7 @@ msg_t Odometry::main(void) {
   while (!this->shouldTerminate()) {
     time += MS2ST(this->period);
 
-    // Update the base distance, because it may change after a calibration
+    // Update the base distance, because it may have changed after a calibration
     this->updateWheelBaseDistance();
 
     // Get the actual speed
@@ -120,11 +116,11 @@ msg_t Odometry::main(void) {
 //     chprintf((BaseSequentialStream*) &global.sercanmux1, "distance_left:%f distance_right:%f", this->distance[0],this->distance[1]);
 //     chprintf((BaseSequentialStream*) &global.sercanmux1, "\r\n");
 
-  if (time >= System::getTime()) {
-      chThdSleepUntil(time);
+    if (time >= System::getTime()) {
+        chThdSleepUntil(time);
     } else {
-      chprintf((BaseSequentialStream*) &global.sercanmux1, "WARNING Odometry: Unable to keep track\r\n");
-  }
+        chprintf((BaseSequentialStream*) &global.sercanmux1, "WARNING Odometry: Unable to keep track\r\n");
+    }
   }
 
   return true;
@@ -134,15 +130,16 @@ void Odometry::updateOdometry() {
 
   // Get the temporary position and error
   float Cp3x3[9];
-  uint32_t angular_ud;
+  int32_t angular_ud;
+  int32_t angularRate_udps;
   chSysLock();
     float pX = this->pX;
     float pY = this->pY;
     float pPhi = this->pPhi;
     Matrix::copy<float>(this->Cp3x3,3,3,Cp3x3,3,3);
-    // Get the differentail gyro information and reset it
-    angular_ud = gyro->getAngular_ud(L3G4200D::AXIS_Z);
-  gyro->angularReset();
+    // TODO Get the gyro (or gyro rate) information and do something with it
+    // angular_ud = gyro->getAngular_ud(L3G4200D::AXIS_Z);
+    // angularRate_udps = gyro->getAngularRate_udps(L3G4200D::AXIS_Z);
   chSysUnlock();
 
   ////////////////
@@ -150,8 +147,11 @@ void Odometry::updateOdometry() {
   ////////////////
 
   // TMP: Rotated angular
-  // float dPhi = (this->distance[RIGHT_WHEEL] - this->distance[LEFT_WHEEL]) / this->wheelBaseDistanceSI;
-  float dPhi = ((float(angular_ud * 1e-3) * M_PI ) * 1e-3) / 180.0f;
+  float dPhi = (this->distance[RIGHT_WHEEL] - this->distance[LEFT_WHEEL]) / this->wheelBaseDistanceSI;
+  // TODO Calculate the differential angel dPhi from either the angular (1. line) or angular rate (2.+3. line)
+  // float dPhi = ((float(angular_ud * 1e-3) * M_PI ) * 1e-3) / 180.0f;
+  // const float angular_md = float((angularRate_udps * this->period / constants::millisecondsPerSecond) * 1e-3);
+  // float dPhi = ((angular_md * M_PI) * 1e-3) / 180.0f;
 
   // TMP: Moved distance
   float dDistance = (this->distance[RIGHT_WHEEL] + this->distance[LEFT_WHEEL]) / 2.0f;

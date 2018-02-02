@@ -849,6 +849,10 @@ int main(void) {
 
   global.increments.start();  // Start the qei driver
 
+  // Start the three axes gyroscope
+  global.l3g4200d.configure(&global.gyro_run_config);
+  global.l3g4200d.start(NORMALPRIO+5);
+
   global.odometry.start(NORMALPRIO + 20);
 
   global.robot.start(HIGHPRIO - 1);
@@ -866,10 +870,6 @@ int main(void) {
   // Start the three axes linear accelerometer
   global.lis331dlh.configure(&global.accel_run_config);
   global.lis331dlh.start(NORMALPRIO+4);
-
-  // Start the three axes gyroscope
-  global.l3g4200d.configure(&global.gyro_run_config);
-  global.l3g4200d.start(NORMALPRIO+5);
 
   // Start the user thread
   global.userThread.start(NORMALPRIO);

@@ -37,7 +37,7 @@ msg_t L3G4200D::main() {
   this->setName("l3g4200d");
 
   while (!this->shouldTerminate()) {
-  time += this->period_st;
+    time += this->period_st;
 
     updateSensorData();
     calcAngular();
@@ -48,7 +48,7 @@ msg_t L3G4200D::main() {
       chThdSleepUntil(time);
     } else {
       chprintf((BaseSequentialStream*) &global.sercanmux1, "WARNING l3g4200d: Unable to keep track\r\n");
-  }
+    }
   }
   return RDY_OK;
 }
@@ -62,7 +62,7 @@ getAngularRate(const uint8_t axis) {
 int32_t
 L3G4200D::
 getAngularRate_udps(const uint8_t axis) {
-  return uint32_t(this->angularRate[axis]) * this->udpsPerTic;
+  return int32_t(this->angularRate[axis]) * this->udpsPerTic;
 }
 
 int32_t
@@ -160,7 +160,8 @@ msg_t L3G4200D::configure(const L3G4200DConfig *config) {
     case L3G4200D::DR_400_HZ: this->period_us =  2500; break;
     case L3G4200D::DR_800_HZ: this->period_us =  1250; break;
   }
-  this->period_st = US2ST(this->period_st);
+  this->period_st = US2ST(this->period_us);
+  this->period_ms = this->period_us * 1e-3;
 
   // Handle the new full scale
   switch(config->ctrl1 & L3G4200D::FS_MASK) {
