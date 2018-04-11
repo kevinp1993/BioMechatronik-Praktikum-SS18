@@ -640,9 +640,9 @@ int main(void) {
               break;
           }
         }
-        // handle bootloader version 1.0.x
+        // handle bootloader version 1.0.x and 1.1.x
         else if ((*((uint32_t*)(BL_CALLBACK_TABLE_ADDR)) == (('A'<<24) | ('-'<<16) | ('B'<<8) | ('L'<<0))) &&
-                 ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->major == 1 && ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor == 0) {
+                 ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->major == 1 && (((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor == 0 || ((blVersion_t*)(BL_CALLBACK_TABLE_ADDR + (1*4)))->minor == 1)) {
           switch (shutdown_now) {
             case SHUTDOWN_TRANSPORTATION:
               blCallbackPtrAddr += 6 * 4;
