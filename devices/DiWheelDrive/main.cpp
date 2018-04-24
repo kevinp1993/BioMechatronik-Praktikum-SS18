@@ -690,6 +690,11 @@ void shellRequestMotorResetGains(BaseSequentialStream *chp, int argc, char *argv
   return;
 }
 
+void shellRequestHelloWorld(BaseSequentialStream *chp, int argc, char *argv[]) {
+	chprintf(chp, "Hello World");
+	return;
+}
+
 static const ShellCommand commands[] = {
   {"shutdown", shellRequestShutdown},
   {"wakeup", shellRequestWakeup},
@@ -716,6 +721,7 @@ static const ShellCommand commands[] = {
   {"motor_calibrate", shellRequestMotorCalibrate},
   {"motor_getGains", shellRequestMotorGetGains},
   {"motor_resetGains", shellRequestMotorResetGains},
+  {"hello_world", shellRequestHelloWorld},
   {NULL, NULL}
 };
 
