@@ -1,0 +1,184 @@
+README.txt:38:     modular & customizable open-source mini robot platform," 2016 20th
+README.txt:150:'hterm' or 'gtkterm' application for accessing the robot. To ease further
+README.txt:196:After compilation, you always have to flash the generated program to the robot.
+bootloader/AMiRo-BLT/README.txt:32:     modular & customizable open-source mini robot platform," 2016 20th
+bootloader/AMiRo-BLT/README.txt:171:accessible when the robot is fully set up, this enables to update the firmware
+bootloader/AMiRo-BLT/README.txt:231:and damage the robot.
+periphery-lld/AMiRo-LLD/README.txt:32:     modular & customizable open-source mini robot platform," 2016 20th
+components/ControllerAreaNetworkRx.cpp:71:        this->robotPosition.x = (frame->data8[0] << 8 | frame->data8[1] << 16 | frame->data8[2] << 24);
+components/ControllerAreaNetworkRx.cpp:72:        this->robotPosition.y = (frame->data8[3] << 8 | frame->data8[4] << 16 | frame->data8[5] << 24);
+components/ControllerAreaNetworkRx.cpp:73:        this->robotPosition.f_z = (frame->data8[6] << 8 | frame->data8[7] << 16);
+components/ControllerAreaNetworkRx.cpp:101:        robotId = frame->data8[0];
+components/ControllerAreaNetworkRx.cpp:153:  return this->robotPosition;
+components/ControllerAreaNetworkRx.cpp:161:  return this->robotId;
+components/power/adconverter.cpp:120:          global.robot.getPowerStatus().charging_flags.content.vsys_higher_than_9V = true;
+components/power/adconverter.cpp:127:          global.robot.getPowerStatus().charging_flags.content.vsys_higher_than_9V = false;
+components/Odometry.cpp:56:  types::position robotPosition;
+components/Odometry.cpp:60:    robotPosition.x = this->pX * 1e6;
+components/Odometry.cpp:61:    robotPosition.y = this->pY * 1e6;
+components/Odometry.cpp:62:    robotPosition.f_z = (int32_t(this->pPhi * 1e6) % piScaled) + ((this->pPhi < 0) ? piScaled : 0);  // Get only the postitve angel f_z in [0 .. 2 * pi]
+components/Odometry.cpp:64://     chprintf((BaseSequentialStream*) &global.sercanmux1, "X:%d Y:%d Phi:%d", robotPosition.x,robotPosition.y, robotPosition.f_z);
+components/Odometry.cpp:68:  return robotPosition;
+components/ControllerAreaNetworkTx.cpp:57:void ControllerAreaNetworkTx::setOdometry(types::position robotPosition) {
+components/ControllerAreaNetworkTx.cpp:62:  int32_t x_mm = (robotPosition.x >> 8);
+components/ControllerAreaNetworkTx.cpp:63:  int32_t y_mm = (robotPosition.y >> 8);
+components/ControllerAreaNetworkTx.cpp:64:  int16_t f_z_mrad = int16_t(robotPosition.f_z >> 8 );
+devices/DiWheelDrive/userthread.cpp:310:	global.robot.setLightColor(constants::LightRing::LED_WNW, memberToLed(member[constants::DiWheelDrive::PROX_WHEEL_LEFT]));
+devices/DiWheelDrive/userthread.cpp:311:	global.robot.setLightColor(constants::LightRing::LED_NNW, memberToLed(member[constants::DiWheelDrive::PROX_FRONT_LEFT]));
+devices/DiWheelDrive/userthread.cpp:312:	global.robot.setLightColor(constants::LightRing::LED_NNE, memberToLed(member[constants::DiWheelDrive::PROX_FRONT_RIGHT]));
+devices/DiWheelDrive/userthread.cpp:313:	global.robot.setLightColor(constants::LightRing::LED_ENE, memberToLed(member[constants::DiWheelDrive::PROX_WHEEL_RIGHT]));
+devices/DiWheelDrive/userthread.cpp:355:		global.robot.setLightColor(led, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:374:                // stop the robot
+devices/DiWheelDrive/userthread.cpp:378:                // start the robot
+devices/DiWheelDrive/userthread.cpp:382:            global.robot.setLightColor(constants::LightRing::LED_SSW, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:383:            global.robot.setLightColor(constants::LightRing::LED_WSW, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:384:            global.robot.setLightColor(constants::LightRing::LED_WNW, Color(Color::WHITE));
+devices/DiWheelDrive/userthread.cpp:385:            global.robot.setLightColor(constants::LightRing::LED_NNW, Color(Color::WHITE));
+devices/DiWheelDrive/userthread.cpp:386:            global.robot.setLightColor(constants::LightRing::LED_NNE, Color(Color::WHITE));
+devices/DiWheelDrive/userthread.cpp:387:            global.robot.setLightColor(constants::LightRing::LED_ENE, Color(Color::WHITE));
+devices/DiWheelDrive/userthread.cpp:388:            global.robot.setLightColor(constants::LightRing::LED_ESE, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:389:            global.robot.setLightColor(constants::LightRing::LED_SSE, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:391:            global.robot.setLightColor(constants::LightRing::LED_WNW, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:392:            global.robot.setLightColor(constants::LightRing::LED_NNW, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:393:            global.robot.setLightColor(constants::LightRing::LED_NNE, Color(Color::BLACK));
+devices/DiWheelDrive/userthread.cpp:394:            global.robot.setLightColor(constants::LightRing::LED_ENE, Color(Color::BLACK));
+devices/DiWheelDrive/DiWheelDrive.h:45:    types::position robotPosition;
+devices/DiWheelDrive/DiWheelDrive.cpp:65:        int32_t robotPositionX = (frame->data8[0] << 8 | frame->data8[1] << 16 | frame->data8[2] << 24);
+devices/DiWheelDrive/DiWheelDrive.cpp:66:        int32_t robotPositionY = (frame->data8[3] << 8 | frame->data8[4] << 16 | frame->data8[5] << 24);
+devices/DiWheelDrive/DiWheelDrive.cpp:67:        int32_t robotPositionF_Z = (frame->data8[6] << 8 | frame->data8[7] << 16);
+devices/DiWheelDrive/DiWheelDrive.cpp:68:        global.odometry.setPosition(float(robotPositionX)*1e-6,float(robotPositionY)*1e-6,float(robotPositionF_Z)*1e-6);
+devices/DiWheelDrive/DiWheelDrive.cpp:92:        int32_t robotPositionX = (frame->data8[0] << 8 | frame->data8[1] << 16 | frame->data8[2] << 24);
+devices/DiWheelDrive/DiWheelDrive.cpp:93:        int32_t robotPositionF_Z = (frame->data8[3] << 8 | frame->data8[4] << 16 | frame->data8[5] << 24);
+devices/DiWheelDrive/DiWheelDrive.cpp:95:        //chprintf((BaseSequentialStream*) &SD1, "\nx=%d\nf_z=%d\nt=%d", robotPositionX, robotPositionF_Z, targetTimeMilliSeconds);
+devices/DiWheelDrive/DiWheelDrive.cpp:96:        global.distcontrol.setTargetPosition(robotPositionX, robotPositionF_Z, targetTimeMilliSeconds);
+devices/DiWheelDrive/DiWheelDrive.cpp:139:  // Update robot velocity values
+devices/DiWheelDrive/DiWheelDrive.cpp:145:  this->robotPosition = global.odometry.getPosition();
+devices/DiWheelDrive/DiWheelDrive.cpp:182:  int32_t x_mm = (this->robotPosition.x >> 8);
+devices/DiWheelDrive/DiWheelDrive.cpp:183:  int32_t y_mm = (this->robotPosition.y >> 8);
+devices/DiWheelDrive/DiWheelDrive.cpp:184:  int16_t f_z_mrad = int16_t(this->robotPosition.f_z >> 8 );
+devices/DiWheelDrive/DiWheelDrive.cpp:227:    frame.data8[0] = this->robotId;
+devices/DiWheelDrive/DiWheelDrive.cpp:260:  // set the robot ID as the board ID, which is read from the memory
+devices/DiWheelDrive/DiWheelDrive.cpp:261:  if (global.memory.getBoardId(&this->robotId) != fileSystemIo::FileSystemIoBase::OK) {
+devices/DiWheelDrive/DiWheelDrive.cpp:262:    this->robotId = 0;
+devices/DiWheelDrive/main.cpp:46:  global.robot.setTargetSpeed(k);
+devices/DiWheelDrive/main.cpp:47:  global.robot.terminate();
+devices/DiWheelDrive/main.cpp:99:    chprintf(chp, "                   The robot can not be charged.\n");
+devices/DiWheelDrive/main.cpp:101:    chprintf(chp, "                   The robot can only be charged via the power plug.\n");
+devices/DiWheelDrive/main.cpp:297:    global.robot.setLightColor(constants::LightRing::LED_SSW, color);
+devices/DiWheelDrive/main.cpp:300:    global.robot.setLightColor(constants::LightRing::LED_WSW, color);
+devices/DiWheelDrive/main.cpp:303:    global.robot.setLightColor(constants::LightRing::LED_WNW, color);
+devices/DiWheelDrive/main.cpp:306:    global.robot.setLightColor(constants::LightRing::LED_NNW, color);
+devices/DiWheelDrive/main.cpp:309:    global.robot.setLightColor(constants::LightRing::LED_NNE, color);
+devices/DiWheelDrive/main.cpp:312:    global.robot.setLightColor(constants::LightRing::LED_ENE, color);
+devices/DiWheelDrive/main.cpp:315:    global.robot.setLightColor(constants::LightRing::LED_ESE, color);
+devices/DiWheelDrive/main.cpp:318:    global.robot.setLightColor(constants::LightRing::LED_SSE, color);
+devices/DiWheelDrive/main.cpp:574:  global.robot.calibrate();
+devices/DiWheelDrive/main.cpp:579:  chprintf(chp, "Robot ID: %u\n", global.robot.getRobotID());
+devices/DiWheelDrive/main.cpp:580:  if (global.robot.getRobotID() == 0)
+devices/DiWheelDrive/main.cpp:653:      chprintf(chp, "Wrong number of parameters given (%i), stopping robot \n", argc);
+devices/DiWheelDrive/main.cpp:714:  {"get_robot_id", shellRequestGetRobotId},
+devices/DiWheelDrive/main.cpp:864:  global.robot.start(HIGHPRIO - 1);
+Übereinstimmungen in Binärdatei devices/DiWheelDrive/build/obj/main.o
+Übereinstimmungen in Binärdatei devices/DiWheelDrive/build/DiWheelDrive.bin
+Übereinstimmungen in Binärdatei devices/DiWheelDrive/build/DiWheelDrive.elf
+devices/DiWheelDrive/build/lst/main.lst:3990: 3720 00d8 20202020 		.ascii	"                   The robot can not be charged.\012"
+devices/DiWheelDrive/build/lst/main.lst:4010: 3728 0154 20202020 		.ascii	"                   The robot can only be charged vi"
+devices/DiWheelDrive/build/lst/main.lst:5211: 4248 1464 6765745F 		.ascii	"get_robot_id\000"
+devices/DiWheelDrive/global.hpp:164:  DiWheelDrive robot;
+devices/DiWheelDrive/global.hpp:195:    robot(&CAND1),
+devices/PowerManagement/userthread.cpp:98:    global.robot.setLightColor(led, Color(Color::BLACK));
+devices/PowerManagement/userthread.cpp:115:              global.robot.setLightColor(led, Color(Color::WHITE));
+devices/PowerManagement/userthread.cpp:119:              global.robot.setLightColor(led, Color(Color::BLACK));
+devices/PowerManagement/userthread.cpp:128:            global.robot.setLightColor(constants::LightRing::LED_NNW, Color(Color::GREEN));
+devices/PowerManagement/userthread.cpp:129:            global.robot.setLightColor(constants::LightRing::LED_NNE, Color(Color::GREEN));
+devices/PowerManagement/userthread.cpp:130:            global.robot.setLightColor(constants::LightRing::LED_SSW, Color(Color::RED));
+devices/PowerManagement/userthread.cpp:131:            global.robot.setLightColor(constants::LightRing::LED_SSE, Color(Color::RED));
+devices/PowerManagement/userthread.cpp:132:            global.robot.setLightColor(constants::LightRing::LED_WNW, Color(Color::BLUE));
+devices/PowerManagement/userthread.cpp:133:            global.robot.setLightColor(constants::LightRing::LED_WSW, Color(Color::BLUE));
+devices/PowerManagement/userthread.cpp:134:            global.robot.setLightColor(constants::LightRing::LED_ENE, Color(Color::BLUE));
+devices/PowerManagement/userthread.cpp:135:            global.robot.setLightColor(constants::LightRing::LED_ESE, Color(Color::BLUE));
+devices/PowerManagement/userthread.cpp:144:            // stop the robot
+devices/PowerManagement/userthread.cpp:146:            global.robot.setTargetSpeed(kinematic);
+devices/PowerManagement/userthread.cpp:150:              global.robot.setLightColor(led, Color(Color::WHITE));
+devices/PowerManagement/userthread.cpp:154:              global.robot.setLightColor(led, Color(Color::BLACK));
+devices/PowerManagement/userthread.cpp:166:            // stop the robot
+devices/PowerManagement/userthread.cpp:168:            global.robot.setTargetSpeed(kinematic);
+devices/PowerManagement/userthread.cpp:177:              global.robot.setLightColor(led, Color(Color::BLACK));
+devices/PowerManagement/userthread.cpp:243:          global.robot.setLightColor(obstacle_avoidance::ProxId2LedId(sensor), obstacle_avoidance::Prox2Color(proxNormalized[sensor]));
+devices/PowerManagement/userthread.cpp:256:        global.robot.setTargetSpeed(kinematic);
+devices/PowerManagement/userthread.cpp:372:          global.robot.setTargetSpeed(kinematic);
+devices/PowerManagement/userthread.cpp:380:  // stop the robot
+devices/PowerManagement/userthread.cpp:382:  global.robot.setTargetSpeed(kinematic);
+devices/PowerManagement/main.cpp:67:  global.robot.broadcastShutdown();
+devices/PowerManagement/main.cpp:112:  global.robot.terminate();
+devices/PowerManagement/main.cpp:146:  global.robot.broadcastShutdown();
+devices/PowerManagement/main.cpp:159:  global.robot.terminate();
+devices/PowerManagement/main.cpp:464:    chprintf(chp, "                   The robot can not be charged.\n");
+devices/PowerManagement/main.cpp:466:    chprintf(chp, "                   The robot can only be charged via the power plug.\n");
+devices/PowerManagement/main.cpp:735:  global.robot.calibrate();
+devices/PowerManagement/main.cpp:741:  chprintf(chp, "Robot ID: %u\n", global.robot.getRobotID());
+devices/PowerManagement/main.cpp:742:  if (global.robot.getRobotID() == 0) {
+devices/PowerManagement/main.cpp:779:  global.robot.getPowerStatus().charging_flags.content.diwheeldrive_enable_power_path = enable;
+devices/PowerManagement/main.cpp:903:  {"get_robot_id", shellRequestGetRobotId},
+devices/PowerManagement/main.cpp:1017:  global.robot.start(HIGHPRIO - 1);
+devices/PowerManagement/PowerManagement.cpp:56:        this->robotId = frame->data8[0];
+Übereinstimmungen in Binärdatei devices/PowerManagement/build/PowerManagement.bin
+Übereinstimmungen in Binärdatei devices/PowerManagement/build/obj/main.o
+Übereinstimmungen in Binärdatei devices/PowerManagement/build/PowerManagement.elf
+devices/PowerManagement/build/lst/main.lst:4860: 4536 00d8 20202020 		.ascii	"                   The robot can not be charged.\012"
+devices/PowerManagement/build/lst/main.lst:4883: 4544 0154 20202020 		.ascii	"                   The robot can only be charged vi"
+devices/PowerManagement/build/lst/main.lst:6136: 5106 14a8 6765745F 		.ascii	"get_robot_id\000"
+devices/PowerManagement/global.hpp:143:  PowerManagement robot;
+devices/PowerManagement/global.hpp:195:    robot(&CAND1),
+devices/LightRing/main.cpp:46:    chprintf(chp, "                   The robot can not be charged.\n");
+devices/LightRing/main.cpp:48:    chprintf(chp, "                   The robot can only be charged via the power plug.\n");
+devices/LightRing/main.cpp:114:    global.robot.setLightBrightness(brightness);
+devices/LightRing/main.cpp:115:    global.robot.setLightColor((i / 2) % 8, color);
+devices/LightRing/main.cpp:124:  global.robot.setLightBrightness(50);
+devices/LightRing/main.cpp:129:      global.robot.setLightColor(j, color);
+devices/LightRing/main.cpp:140:      global.robot.setLightColor(j, color);
+devices/LightRing/main.cpp:148:    global.robot.setLightColor(j, Color::WHITE);
+devices/LightRing/main.cpp:152:    global.robot.setLightBrightness(brightness);
+devices/LightRing/main.cpp:202:  global.robot.setLightBrightness(0);
+devices/LightRing/main.cpp:203:  global.robot.terminate();
+devices/LightRing/main.cpp:274:  global.robot.setLightBrightness(0);
+devices/LightRing/main.cpp:403:  chprintf(chp, "Robot ID: %u\n", global.robot.getRobotID());
+devices/LightRing/main.cpp:404:  if (global.robot.getRobotID() == 0)
+devices/LightRing/main.cpp:470:  {"get_robot_id", shellRequestGetRobotId},
+devices/LightRing/main.cpp:551:  global.robot.start(HIGHPRIO - 1);
+devices/LightRing/main.cpp:567:  global.robot.setLightBrightness(10);
+devices/LightRing/main.cpp:568:  global.robot.setLightColor(0, Color::RED);
+devices/LightRing/main.cpp:569:  global.robot.setLightColor(1, Color::LIME);
+devices/LightRing/main.cpp:570:  global.robot.setLightColor(2, Color::BLUE);
+devices/LightRing/main.cpp:571:  global.robot.setLightColor(3, Color::WHITE);
+devices/LightRing/main.cpp:572:  global.robot.setLightColor(4, Color::RED);
+devices/LightRing/main.cpp:573:  global.robot.setLightColor(5, Color::LIME);
+devices/LightRing/main.cpp:574:  global.robot.setLightColor(6, Color::BLUE);
+devices/LightRing/main.cpp:575:  global.robot.setLightColor(7, Color::WHITE);
+Übereinstimmungen in Binärdatei devices/LightRing/build/obj/main.o
+Übereinstimmungen in Binärdatei devices/LightRing/build/LightRing.bin
+Übereinstimmungen in Binärdatei devices/LightRing/build/LightRing.elf
+devices/LightRing/build/lst/main.lst:2145: 1985 00d8 20202020 		.ascii	"                   The robot can not be charged.\012"
+devices/LightRing/build/lst/main.lst:2168: 1993 0154 20202020 		.ascii	"                   The robot can only be charged vi"
+devices/LightRing/build/lst/main.lst:2795: 2276 0b38 6765745F 		.ascii	"get_robot_id\000"
+devices/LightRing/LightRing.cpp:89:        this->robotId = frame->data8[0];
+devices/LightRing/global.hpp:70:  LightRing robot;
+devices/LightRing/global.hpp:89:    robot(&CAND1, &tlc5947, &memory),
+include/Types.h:23:   * A structure to represent the position and orientation of the robot
+include/Types.h:37:   * A structure to represent the position and orientation of the robot
+include/Types.h:51:   * A structure to represent the kinematics of the robot
+include/Types.h:65:   * A structure to represent the kinematics of the robot
+include/Types.h:79:   * A structure to represent the power status of the robot
+include/amiro/MotorControl.h:85:     * robot using eq. 4.
+include/amiro/MotorControl.h:144:     * Calculate the velocitiy in the robot frame
+include/amiro/MotorControl.h:150:     * PID Controller that works directly on the forward velocity v of the robots center and its
+include/amiro/Odometry.h:23:     * Set the position of the roboter
+include/amiro/Odometry.h:37:     * Set the position of the roboter
+include/amiro/ControllerAreaNetworkTx.h:35:     * @param targetSpeed Desired speed of the robot
+include/amiro/ControllerAreaNetworkTx.h:50:     * \notice Only bits 31..8 of robotPosition.x and robotPosition.y will be sent,
+include/amiro/ControllerAreaNetworkTx.h:57:     * @param robotPosition Desired robot position.
+include/amiro/ControllerAreaNetworkTx.h:59:    void setOdometry(types::position robotPosition);
+include/amiro/ControllerAreaNetworkTx.h:62:     * \brief Setting target position of current robot
+include/amiro/ControllerAreaNetworkTx.h:65:     * @param targetPosition Desired robot position
+include/amiro/ControllerAreaNetworkRx.h:45:    types::position robotPosition;
+include/amiro/ControllerAreaNetworkRx.h:47:    uint8_t robotId;
