@@ -124,8 +124,7 @@ CPPSRC = $(CHCPPSRC) \
          DiWheelDrive.cpp \
          userthread.cpp \
          main.cpp \
-         exti.cpp \
-         LineFollowingPID.cpp
+         exti.cpp
 
 # C sources to be compiled in ARM mode regardless of the global setting.
 # NOTE: Mixing ARM and THUMB mode enables the -mthumb-interwork compiler

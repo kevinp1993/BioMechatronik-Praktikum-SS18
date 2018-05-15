@@ -17,8 +17,6 @@
 #include <chprintf.h>
 #include <shell.h>
 
-#include "LineFollowingPID.hpp"
-
 using namespace chibios_rt;
 
 Global global;
@@ -697,58 +695,6 @@ void shellRequestHelloWorld(BaseSequentialStream *chp, int argc, char *argv[]) {
 	return;
 }
 
-void shellRequestLineFollowingShowPID(BaseSequentialStream *chp, int argc, char *argv[]) {
-	chprintf(chp, "Kp = %f \n", LineFollowingPID::Kp);
-	chprintf(chp, "Ki = %f \n", LineFollowingPID::Ki);
-	chprintf(chp, "Kd = %f \n", LineFollowingPID::Kd);
-	return;
-}
-
-void shellRequestLineFollowingChangePID(BaseSequentialStream *chp, int argc, char *argv[]) {
-	if (argc == 1)
-	{
-		chprintf(chp, "Set Kp to %f \n", atof(argv[0]));
-		LineFollowingPID::Kp = atof(argv[0]);
-	} 
-	else 
-	{
-		if(argc == 2){
-		chprintf(chp, "Set Kp to %f \n", atof(argv[0]));
-		chprintf(chp, "Set Ki to %f \n", atof(argv[1]));
-		LineFollowingPID::Kp = atof(argv[0]);
-		LineFollowingPID::Ki = atof(argv[1]);
-		} 	
-		else 
-		{
-			if(argc == 3){
-				chprintf(chp, "Set Kp to %f \n", atof(argv[0]));
-				chprintf(chp, "Set Ki to %f \n", atof(argv[1]));
-				chprintf(chp, "Set Kd to %f \n", atof(argv[2]));
-				LineFollowingPID::Kp = atof(argv[0]);
-				LineFollowingPID::Ki = atof(argv[1]);
-				LineFollowingPID::Ki = atof(argv[2]);
-			} 
-			else {
-				chprintf(chp, "Wrong number of parameters given (%i)\n", argc);
-			}
-		}
-	}
-	return;
-}
-
-void shellRequestLineFollowingChangeSpeed(BaseSequentialStream *chp, int argc, char *argv[]) {
-	if (argc == 1)
-	{
-		chprintf(chp, "Set Maximal Speed in Line Following to %i \n", atoi(argv[0]));
-		LineFollowingPID::MaxSpeed = atoi(argv[0]);
-	} 
-	else if (argc == 2)
-	{
-		chprintf(chp, "Wrong number of parameters given (%i)\n", argc);
-	}
-	return;
-}
-
 static const ShellCommand commands[] = {
   {"shutdown", shellRequestShutdown},
   {"wakeup", shellRequestWakeup},
@@ -776,9 +722,6 @@ static const ShellCommand commands[] = {
   {"motor_getGains", shellRequestMotorGetGains},
   {"motor_resetGains", shellRequestMotorResetGains},
   {"hello_world", shellRequestHelloWorld},
-  {"show_PID", shellRequestLineFollowingShowPID},
-  {"change_PID", shellRequestLineFollowingChangePID},
-  {"change_MaxSpeed", shellRequestLineFollowingChangeSpeed},
   {NULL, NULL}
 };
 
